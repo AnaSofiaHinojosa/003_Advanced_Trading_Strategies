@@ -1,6 +1,5 @@
 absl-py==2.3.1
 alembic==1.17.0
-alibi-detect==0.12.0
 altair==5.5.0
 annotated-types==0.7.0
 anyio==4.11.0
