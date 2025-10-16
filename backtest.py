@@ -148,4 +148,8 @@ def backtest(data):
     active_long_positions = []
     active_short_positions = []
 
-    return cash, portfolio_value
+    # Calculate win rate
+    win_rate = positive_trades / (positive_trades + negative_trades) if (positive_trades + negative_trades) > 0 else 0
+    total_trades = positive_trades + negative_trades
+
+    return cash, portfolio_value, win_rate, total_trades
