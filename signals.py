@@ -4,10 +4,18 @@ import pandas as pd
 
 def momentum_indicators(df: pd.DataFrame,
                         rsi_window: int = 14,
+                        rsi2_window: int = 10,
+                        rsi3_window: int = 20,
                         kama_window: int = 30,
                         stoch_window: int = 14,
+                        stoch2_window: int = 10,
+                        stoch3_window: int = 20,
                         roc_window: int = 12,
+                        roc2_window: int = 10,
+                        roc3_window: int = 20,
                         williams_r_window: int = 14,
+                        williams_r2_window: int = 7,
+                        williams_r3_window: int = 21,
                         kama_pow1: int = 2,
                         kama_pow2: int = 30) -> pd.DataFrame:
 
@@ -16,6 +24,8 @@ def momentum_indicators(df: pd.DataFrame,
     # --- Momentum indicators ---
     # RSI
     df['rsi'] = ta.momentum.RSIIndicator(df['Close'], window=rsi_window).rsi()
+    df['rsi2'] = ta.momentum.RSIIndicator(df['Close'], window=rsi2_window).rsi()
+    df['rsi3'] = ta.momentum.RSIIndicator(df['Close'], window=rsi3_window).rsi()
 
     # KAMA
     df['kama'] = ta.momentum.KAMAIndicator(
@@ -24,13 +34,23 @@ def momentum_indicators(df: pd.DataFrame,
     # Stochastic Oscillator
     df['stoch'] = ta.momentum.StochasticOscillator(
         df['High'], df['Low'], df['Close'], window=stoch_window).stoch()
+    df['stoch2'] = ta.momentum.StochasticOscillator(
+        df['High'], df['Low'], df['Close'], window=stoch2_window).stoch()
+    df['stoch3'] = ta.momentum.StochasticOscillator(
+        df['High'], df['Low'], df['Close'], window=stoch3_window).stoch()
 
     # ROC
     df['roc'] = ta.momentum.ROCIndicator(df['Close'], window=roc_window).roc()
+    df['roc2'] = ta.momentum.ROCIndicator(df['Close'], window=roc2_window).roc()
+    df['roc3'] = ta.momentum.ROCIndicator(df['Close'], window=roc3_window).roc()
 
     # Williams %R
     df['williams_r'] = ta.momentum.WilliamsRIndicator(
         df['High'], df['Low'], df['Close'], lbp=williams_r_window).williams_r()
+    df['williams_r2'] = ta.momentum.WilliamsRIndicator(
+        df['High'], df['Low'], df['Close'], lbp=williams_r2_window).williams_r()
+    df['williams_r3'] = ta.momentum.WilliamsRIndicator(
+        df['High'], df['Low'], df['Close'], lbp=williams_r3_window).williams_r()
 
     return df
 
@@ -124,18 +144,44 @@ def get_signals(df: pd.DataFrame,
     df['buy_signal_rsi'] = df['rsi'] < rsi_buy
     df['sell_signal_rsi'] = df['rsi'] > rsi_sell
 
+    df['buy_signal_rsi2'] = df['rsi2'] < rsi_buy
+    df['sell_signal_rsi2'] = df['rsi2'] > rsi_sell
+
+    df['buy_signal_rsi3'] = df['rsi3'] < rsi_buy
+    df['sell_signal_rsi3'] = df['rsi3'] > rsi_sell
+
     df['buy_signal_kama'] = df['Close'] > df['kama']
     df['sell_signal_kama'] = df['Close'] < df['kama']
 
     df['buy_signal_stoch'] = df['stoch'] < stoch_buy
     df['sell_signal_stoch'] = df['stoch'] > stoch_sell
 
+    df['buy_signal_stoch2'] = df['stoch2'] < stoch_buy
+    df['sell_signal_stoch2'] = df['stoch2'] > stoch_sell
+
+    df['buy_signal_stoch3'] = df['stoch3'] < stoch_buy
+    df['sell_signal_stoch3'] = df['stoch3'] > stoch_sell
+
     df['roc_sma'] = df['roc'].rolling(roc_sma_window).mean()
     df['buy_signal_roc'] = df['roc_sma'] > 0
     df['sell_signal_roc'] = df['roc_sma'] < 0
 
+    df['roc2_sma'] = df['roc2'].rolling(roc_sma_window).mean()
+    df['buy_signal_roc2'] = df['roc2_sma'] > 0
+    df['sell_signal_roc2'] = df['roc2_sma'] < 0
+
+    df['roc3_sma'] = df['roc3'].rolling(roc_sma_window).mean()
+    df['buy_signal_roc3'] = df['roc3_sma'] > 0
+    df['sell_signal_roc3'] = df['roc3_sma'] < 0
+
     df['buy_signal_williams_r'] = df['williams_r'] < williams_buy
     df['sell_signal_williams_r'] = df['williams_r'] > williams_sell
+
+    df['buy_signal_williams_r2'] = df['williams_r2'] < williams_buy
+    df['sell_signal_williams_r2'] = df['williams_r2'] > williams_sell
+
+    df['buy_signal_williams_r3'] = df['williams_r3'] < williams_buy
+    df['sell_signal_williams_r3'] = df['williams_r3'] > williams_sell
 
     df['buy_signal_bb'] = df['Close'] < df['bb_lower']
     df['sell_signal_bb'] = df['Close'] > df['bb_upper']
