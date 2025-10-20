@@ -46,6 +46,9 @@ def backtest(data):
     positive_trades = 0
     negative_trades = 0
 
+    buy = 0
+    sell = 0
+
     for i, row in enumerate(historic.itertuples(index=True)):
         # Close positions
         for position in active_long_positions.copy():
@@ -82,12 +85,13 @@ def backtest(data):
 
         # --- BUY ---
         # Check signal
-        if row.buy_signal:
+        if row.final_signal == 1:
             position_value = row.Close * n_shares * (1 + COM)
             # Do we have enough cash?
             if cash > position_value:
                 # Discount the cost
                 cash -= position_value
+                buy += 1
                 # Save the operation as active position
                 active_long_positions.append(
                     Operation(
@@ -102,13 +106,14 @@ def backtest(data):
 
         # --- SELL ---
         # Check signal
-        if row.sell_signal:
+        if row.final_signal == -1:
             position_value = row.Close * n_shares
             short_cost = position_value * COM
             # Do we have enough cash?
             if cash > short_cost:
                 # Discount the cost
                 cash -= short_cost
+                sell += 1
                 # Save the operation as active position
                 active_short_positions.append(
                     Operation(
@@ -149,4 +154,4 @@ def backtest(data):
     win_rate = positive_trades / (positive_trades + negative_trades) if (positive_trades + negative_trades) > 0 else 0
     total_trades = positive_trades + negative_trades
 
-    return cash, portfolio_value, win_rate, total_trades
+    return cash, portfolio_value, win_rate, buy, sell, total_trades

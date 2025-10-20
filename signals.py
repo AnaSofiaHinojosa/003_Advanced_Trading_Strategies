@@ -130,11 +130,53 @@ def get_signals(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df['price_shift'] = df['Close'].diff()
+    df = normalize_indicators(df)
+
+    df['price_shift'] = df['Close'].pct_change().dropna()
     df['final_signal'] = 0
-    df.loc[df['price_shift'] > 0, 'final_signal'] = 1
-    df.loc[df['price_shift'] < 0, 'final_signal'] = -1
+    df.loc[df['price_shift'] > 0.01, 'final_signal'] = 1
+    df.loc[df['price_shift'] < -0.01, 'final_signal'] = -1
 
     df.drop(columns=['price_shift'], inplace=True)
+
+    return df
+
+def normalize_indicators(df):
+    df = df.copy()
+
+    # --- RSI (0 to 100) → 0 to 1---
+    for col in ['rsi', 'rsi2', 'rsi3']:
+        df[col] = df[col] / 100
+
+    # --- Stochastic Oscillator (0 to 100) → 0 to 1---
+    for col in ['stoch', 'stoch2', 'stoch3']:
+        df[col] = df[col] / 100
+
+    # --- Williams %R (-100 to 0) → 0 to 1---
+    for col in ['williams_r', 'williams_r2', 'williams_r3']:
+        df[col] = (df[col] + 100) / 100
+
+    # --- KAMA → relative to Close ---
+    df['kama'] = df['Close'] / df['kama'] - 1
+
+    # --- ROC (z-score) ---
+    for col in ['roc', 'roc2', 'roc3']:
+        df[col] = (df[col] - df[col].mean()) / df[col].std()
+
+    # --- Bollinger Bands → position 0-1 ---
+    df['bb_position'] = (df['Close'] - df['bb_lower']) / (df['bb_upper'] - df['bb_lower'])
+
+    # --- Keltner Channels → position 0-1 ---
+    df['kc_position'] = (df['Close'] - df['kc_lower']) / (df['kc_upper'] - df['kc_lower'])
+
+    # --- Donchian Channels → position 0-1 ---
+    df['donchian_position'] = (df['Close'] - df['donchian_low']) / (df['donchian_high'] - df['donchian_low'])
+
+    # --- OBV, AD, EOM, FI (z-score) ---
+    for col in ['obv', 'ad', 'eom', 'fi']:
+        df[col] = (df[col] - df[col].mean()) / df[col].std()
+
+    # --- CMF (-1 to 1) → 0 to 1 ---
+    df['cmf'] = (df['cmf'] + 1) / 2
 
     return df

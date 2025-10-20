@@ -6,7 +6,7 @@ from backtest import backtest
 from signals import add_all_indicators, get_signals
 from metrics import evaluate_metrics
 
-if __name__ == "__main__":
+def main():
     # --- Load data ---
     data = get_data("AAPL")
 
@@ -14,17 +14,14 @@ if __name__ == "__main__":
     data = add_all_indicators(data)
 
     # --- Generate trading signals ---
-    data = get_signals(data, number_agreement_buy=6, number_agreement_sell=5)
+    data = get_signals(data)
     data = data.dropna()
 
     # --- Backtest the strategy ---
-    cash, portfolio_value, win_rate, total_trades = backtest(data)
+    cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data)
 
-    total_buys = data['buy_signal'].sum()
-    total_sells = data['sell_signal'].sum()
-
-    print(f"Total Buy Signals: {total_buys}")
-    print(f"Total Sell Signals: {total_sells}")
+    print(f"Total buy signals: {buy}")
+    print(f"Total sell signals: {sell}")
     print(f"Total trades: {total_trades}")
     print(f"Win rate: {win_rate:.2%}")
     print("Performance metrics:")
@@ -35,9 +32,12 @@ if __name__ == "__main__":
 
     # --- Plot portfolio value ---
     plt.figure(figsize=(12, 6))
-    plt.plot(portfolio_value, label="Portfolio Value")
-    plt.title("Portfolio Value Over Time")
+    plt.plot(portfolio_value, label="Portfolio value")
+    plt.title("Portfolio value over time")
     plt.xlabel("Time")
-    plt.ylabel("Portfolio Value")
+    plt.ylabel("Portfolio value")
     plt.legend()
     plt.show()
+
+if __name__ == "__main__":
+    main()
