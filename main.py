@@ -40,6 +40,8 @@ def main():
     print(f"Cash: ${cash:,.2f}")
     print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
 
+    print(params)
+
     # --- Plot portfolio value ---
     plt.figure(figsize=(12, 6))
     plt.plot(portfolio_value, label="Portfolio value")

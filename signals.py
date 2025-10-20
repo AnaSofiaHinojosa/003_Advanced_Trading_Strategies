@@ -129,6 +129,8 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
 def normalize_indicators(df):
     df = df.copy()
 
+    params = {}
+
     # --- RSI (0 to 100) → 0 to 1---
     for col in ['rsi', 'rsi2', 'rsi3']:
         df[col] = df[col] / 100
@@ -142,11 +144,15 @@ def normalize_indicators(df):
         df[col] = (df[col] + 100) / 100
 
     # --- KAMA → relative to Close ---
-    df['kama'] = df['Close'] / df['kama'] - 1
+    params['min_kama'] = df['kama'].min()
+    params['max_kama'] = df['kama'].max()
+    df['kama'] = (df['kama'] - params['min_kama']) / (params['max_kama'] - params['min_kama'])
 
     # --- ROC (z-score) ---
     for col in ['roc', 'roc2', 'roc3']:
-        df[col] = (df[col] - df[col].mean()) / df[col].std()
+        params[f'mean_{col}'] = df[col].mean()
+        params[f'std_{col}'] = df[col].std()
+        df[col] = (df[col] - params[f'mean_{col}']) / params[f'std_{col}']
 
     # --- Bollinger Bands → position 0-1 ---
     df['bb_position'] = (df['Close'] - df['bb_lower']) / \
@@ -162,12 +168,16 @@ def normalize_indicators(df):
 
     # --- OBV, AD, EOM, FI (z-score) ---
     for col in ['obv', 'ad', 'eom', 'fi']:
-        df[col] = (df[col] - df[col].mean()) / df[col].std()
+        params[f'mean_{col}'] = df[col].mean()
+        params[f'std_{col}'] = df[col].std()
+        df[col] = (df[col] - params[f'mean_{col}']) / params[f'std_{col}']
 
     # --- CMF (-1 to 1) → 0 to 1 ---
-    df['cmf'] = (df['cmf'] + 1) / 2
+    params['min_cmf'] = df['cmf'].min()
+    params['max_cmf'] = df['cmf'].max()
+    df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
 
-    return df
+    return df, params
 
 
 def get_signals(df: pd.DataFrame) -> pd.DataFrame:
