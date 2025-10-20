@@ -3,8 +3,9 @@ import pandas as pd
 
 from utils import get_data, split_data, get_target
 from backtest import backtest
-from signals import add_all_indicators, get_signals
+from signals import add_all_indicators, get_signals, normalize_indicators
 from metrics import evaluate_metrics
+from plots import plot_portfolio_value
 
 
 def main():
@@ -19,6 +20,7 @@ def main():
 
     # --- Generate trading signals ---
     data_train = get_signals(data_train)
+    data_train, params = normalize_indicators(data_train)
     data_train = data_train.dropna()
 
     # --- Separate target variable ---
@@ -40,16 +42,8 @@ def main():
     print(f"Cash: ${cash:,.2f}")
     print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
 
-    print(params)
-
     # --- Plot portfolio value ---
-    plt.figure(figsize=(12, 6))
-    plt.plot(portfolio_value, label="Portfolio value")
-    plt.title("Portfolio value over time")
-    plt.xlabel("Time")
-    plt.ylabel("Portfolio value")
-    plt.legend()
-    plt.show()
+    plot_portfolio_value(portfolio_value)
 
 if __name__ == "__main__":
     main()

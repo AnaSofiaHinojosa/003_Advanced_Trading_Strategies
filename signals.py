@@ -184,8 +184,6 @@ def get_signals(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df = normalize_indicators(df)
-
     df['price_shift'] = df['Close'].pct_change().dropna()
     df['final_signal'] = 0
     df.loc[df['price_shift'] > 0.005, 'final_signal'] = 1
