@@ -3,7 +3,8 @@ import pandas as pd
 
 from utils import get_data, split_data, get_target
 from backtest import backtest
-from signals import add_all_indicators, get_signals, normalize_indicators
+from signals import add_all_indicators, get_signals
+from normalization import normalize_indicators, normalize_new_data
 from metrics import evaluate_metrics
 from plots import plot_portfolio_value
 
@@ -25,7 +26,21 @@ def main():
 
     # --- Separate target variable ---
     x_train, y_train = get_target(data_train)
-    print(x_train)
+
+    # --- Normalize new data ---
+    data_test = add_all_indicators(data_test)
+    data_test = get_signals(data_test)
+    data_test = normalize_new_data(data_test, params)
+    data_test = data_test.dropna()
+
+    data_val = add_all_indicators(data_val)
+    data_val = get_signals(data_val)
+    data_val = normalize_new_data(data_val, params)
+    data_val = data_val.dropna()
+
+    # --- Separate characteristics for test and validation sets ---
+    x_test, _ = get_target(data_test)
+    x_val, _ = get_target(data_val)
 
     # --- Backtest the strategy ---
     cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data_train)
