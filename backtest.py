@@ -11,9 +11,8 @@ def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[
     # Add short positions value
     for pos in short_ops:
         pnl = (pos.price - current_price) * pos.n_shares
-        initial_sell = pos.price * pos.n_shares
 
-        val += pnl + initial_sell
+        val += pnl
 
     return val
 
@@ -73,8 +72,7 @@ def backtest(data):
         for position in active_short_positions.copy():
             if row.Close < position.take_profit or row.Close > position.stop_loss:
                 pnl = (position.price - row.Close) * position.n_shares * (1 - COM)
-                initial_sell = position.price * position.n_shares
-                cash += pnl + initial_sell
+                cash += pnl
                 # Add to win/loss count
                 if pnl >= 0:
                     positive_trades += 1
@@ -106,11 +104,12 @@ def backtest(data):
         # --- SELL ---
         # Check signal
         if row.sell_signal:
-            position_value = row.Close * n_shares * (1 + COM)
+            position_value = row.Close * n_shares
+            short_cost = position_value * COM
             # Do we have enough cash?
-            if cash > position_value:
+            if cash > short_cost:
                 # Discount the cost
-                cash -= position_value
+                cash -= short_cost
                 # Save the operation as active position
                 active_short_positions.append(
                     Operation(
@@ -137,8 +136,7 @@ def backtest(data):
     
     for position in active_short_positions:
         pnl = (position.price - row.Close) * position.n_shares * (1 - COM)
-        initial_sell = position.price * position.n_shares
-        cash += pnl + initial_sell
+        cash += pnl
         # Add to win/loss count
         if pnl >= 0:
             positive_trades += 1
