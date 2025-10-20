@@ -24,8 +24,10 @@ def momentum_indicators(df: pd.DataFrame,
     # --- Momentum indicators ---
     # RSI
     df['rsi'] = ta.momentum.RSIIndicator(df['Close'], window=rsi_window).rsi()
-    df['rsi2'] = ta.momentum.RSIIndicator(df['Close'], window=rsi2_window).rsi()
-    df['rsi3'] = ta.momentum.RSIIndicator(df['Close'], window=rsi3_window).rsi()
+    df['rsi2'] = ta.momentum.RSIIndicator(
+        df['Close'], window=rsi2_window).rsi()
+    df['rsi3'] = ta.momentum.RSIIndicator(
+        df['Close'], window=rsi3_window).rsi()
 
     # KAMA
     df['kama'] = ta.momentum.KAMAIndicator(
@@ -41,8 +43,10 @@ def momentum_indicators(df: pd.DataFrame,
 
     # ROC
     df['roc'] = ta.momentum.ROCIndicator(df['Close'], window=roc_window).roc()
-    df['roc2'] = ta.momentum.ROCIndicator(df['Close'], window=roc2_window).roc()
-    df['roc3'] = ta.momentum.ROCIndicator(df['Close'], window=roc3_window).roc()
+    df['roc2'] = ta.momentum.ROCIndicator(
+        df['Close'], window=roc2_window).roc()
+    df['roc3'] = ta.momentum.ROCIndicator(
+        df['Close'], window=roc3_window).roc()
 
     # Williams %R
     df['williams_r'] = ta.momentum.WilliamsRIndicator(
@@ -122,103 +126,15 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_signals(df: pd.DataFrame,
-                rsi_buy: float = 30,
-                rsi_sell: float = 70,
-                stoch_buy: float = 20,
-                stoch_sell: float = 80,
-                roc_sma_window: int = 5,
-                williams_buy: float = -80,
-                williams_sell: float = -20,
-                obv_percentage: float = 0.1,
-                ad_ma_window: int = 20,
-                cmf_buy: float = 30,
-                cmf_sell: float = 70,
-                eom_window: int = 20,
-                fi_percentage: float = 0.1,
-                number_agreement_buy: int = 5,
-                number_agreement_sell: int = 5) -> pd.DataFrame:
+def get_signals(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df['buy_signal_rsi'] = df['rsi'] < rsi_buy
-    df['sell_signal_rsi'] = df['rsi'] > rsi_sell
+    df['price_shift'] = df['Close'].diff()
+    df['final_signal'] = 0
+    df.loc[df['price_shift'] > 0, 'final_signal'] = 1
+    df.loc[df['price_shift'] < 0, 'final_signal'] = -1
 
-    df['buy_signal_rsi2'] = df['rsi2'] < rsi_buy
-    df['sell_signal_rsi2'] = df['rsi2'] > rsi_sell
-
-    df['buy_signal_rsi3'] = df['rsi3'] < rsi_buy
-    df['sell_signal_rsi3'] = df['rsi3'] > rsi_sell
-
-    df['buy_signal_kama'] = df['Close'] > df['kama']
-    df['sell_signal_kama'] = df['Close'] < df['kama']
-
-    df['buy_signal_stoch'] = df['stoch'] < stoch_buy
-    df['sell_signal_stoch'] = df['stoch'] > stoch_sell
-
-    df['buy_signal_stoch2'] = df['stoch2'] < stoch_buy
-    df['sell_signal_stoch2'] = df['stoch2'] > stoch_sell
-
-    df['buy_signal_stoch3'] = df['stoch3'] < stoch_buy
-    df['sell_signal_stoch3'] = df['stoch3'] > stoch_sell
-
-    df['roc_sma'] = df['roc'].rolling(roc_sma_window).mean()
-    df['buy_signal_roc'] = df['roc_sma'] > 0
-    df['sell_signal_roc'] = df['roc_sma'] < 0
-
-    df['roc2_sma'] = df['roc2'].rolling(roc_sma_window).mean()
-    df['buy_signal_roc2'] = df['roc2_sma'] > 0
-    df['sell_signal_roc2'] = df['roc2_sma'] < 0
-
-    df['roc3_sma'] = df['roc3'].rolling(roc_sma_window).mean()
-    df['buy_signal_roc3'] = df['roc3_sma'] > 0
-    df['sell_signal_roc3'] = df['roc3_sma'] < 0
-
-    df['buy_signal_williams_r'] = df['williams_r'] < williams_buy
-    df['sell_signal_williams_r'] = df['williams_r'] > williams_sell
-
-    df['buy_signal_williams_r2'] = df['williams_r2'] < williams_buy
-    df['sell_signal_williams_r2'] = df['williams_r2'] > williams_sell
-
-    df['buy_signal_williams_r3'] = df['williams_r3'] < williams_buy
-    df['sell_signal_williams_r3'] = df['williams_r3'] > williams_sell
-
-    df['buy_signal_bb'] = df['Close'] < df['bb_lower']
-    df['sell_signal_bb'] = df['Close'] > df['bb_upper']
-
-    df['buy_signal_kc'] = df['Close'] < df['kc_lower']
-    df['sell_signal_kc'] = df['Close'] > df['kc_upper']
-
-    df['buy_signal_donchian'] = df['Close'] < df['donchian_low']
-    df['sell_signal_donchian'] = df['Close'] > df['donchian_high']
-
-    obv_diff = df['obv'] - df['obv'].shift(1)
-    obv_threshold = df['obv'].std(skipna=True) * obv_percentage
-    df['buy_signal_obv'] = obv_diff > obv_threshold
-    df['sell_signal_obv'] = obv_diff < -obv_threshold
-
-    df['ad_ma'] = df['ad'].rolling(ad_ma_window).mean()
-    df['buy_signal_ad'] = df['ad'] > df['ad_ma']
-    df['sell_signal_ad'] = df['ad'] < df['ad_ma']
-
-    df['buy_signal_cmf'] = df['cmf'] < cmf_buy
-    df['sell_signal_cmf'] = df['cmf'] > cmf_sell
-
-    df['eom_ma'] = df['eom'].rolling(eom_window).mean()
-    df['buy_signal_eom'] = df['eom'] > df['eom_ma']
-    df['sell_signal_eom'] = df['eom'] < df['eom_ma']
-
-    fi_threshold = df['fi'].std() * fi_percentage
-    df['buy_signal_fi'] = df['fi'] > fi_threshold
-    df['sell_signal_fi'] = df['fi'] < -fi_threshold
-
-    buy_cols = [col for col in df.columns if 'buy_signal' in col]
-    sell_cols = [col for col in df.columns if 'sell_signal' in col]
-
-    df['buy_count'] = df[buy_cols].sum(axis=1)
-    df['sell_count'] = df[sell_cols].sum(axis=1)
-
-    df['buy_signal'] = df['buy_count'] >= number_agreement_buy
-    df['sell_signal'] = df['sell_count'] >= number_agreement_sell
+    df.drop(columns=['price_shift'], inplace=True)
 
     return df
