@@ -4,6 +4,15 @@ import pandas as pd
 # 15 years of data
 
 def get_data(ticker: str) -> pd.DataFrame:
+    """
+    Fetch historical market data for a given ticker symbol.
+
+    Parameters:
+        ticker (str): Ticker symbol of the asset.
+
+    Returns:
+        pd.DataFrame: DataFrame containing historical market data.
+    """ 
     data = yf.download(ticker, period="15y", interval="1d")
 
     if isinstance(data.columns, pd.MultiIndex):
@@ -23,12 +32,6 @@ def split_data(data: pd.DataFrame):
 
     Returns:
         tuple: (train, test, validation) DataFrames.
-    
-    Parameters:
-        data (pd.DataFrame): Cleaned market data.
-
-    Returns:
-        tuple: (train, test, validation) DataFrames.
     """
     
     # 60% train, 20% test, 20% validation
@@ -41,3 +44,18 @@ def split_data(data: pd.DataFrame):
     validation = data[train_size + test_size:]
 
     return train, test, validation
+
+def get_target(data:pd.DataFrame) -> pd.Series:
+        """
+        Generate target variable y from the data.
+
+        Parameters:
+            data (pd.DataFrame): Market data with indicators and signals.
+
+        Returns:
+            pd.Series: Target variable indicating final trading signals.
+        """
+        
+        y = data['final_signal']
+        X = data.drop(columns=['final_signal', 'Open', 'High', 'Low', 'Volume'])
+        return X, y

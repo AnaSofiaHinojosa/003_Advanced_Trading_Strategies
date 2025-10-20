@@ -126,21 +126,6 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_signals(df: pd.DataFrame) -> pd.DataFrame:
-
-    df = df.copy()
-
-    df = normalize_indicators(df)
-
-    df['price_shift'] = df['Close'].pct_change().dropna()
-    df['final_signal'] = 0
-    df.loc[df['price_shift'] > 0.01, 'final_signal'] = 1
-    df.loc[df['price_shift'] < -0.01, 'final_signal'] = -1
-
-    df.drop(columns=['price_shift'], inplace=True)
-
-    return df
-
 def normalize_indicators(df):
     df = df.copy()
 
@@ -164,13 +149,16 @@ def normalize_indicators(df):
         df[col] = (df[col] - df[col].mean()) / df[col].std()
 
     # --- Bollinger Bands → position 0-1 ---
-    df['bb_position'] = (df['Close'] - df['bb_lower']) / (df['bb_upper'] - df['bb_lower'])
+    df['bb_position'] = (df['Close'] - df['bb_lower']) / \
+        (df['bb_upper'] - df['bb_lower'])
 
     # --- Keltner Channels → position 0-1 ---
-    df['kc_position'] = (df['Close'] - df['kc_lower']) / (df['kc_upper'] - df['kc_lower'])
+    df['kc_position'] = (df['Close'] - df['kc_lower']) / \
+        (df['kc_upper'] - df['kc_lower'])
 
     # --- Donchian Channels → position 0-1 ---
-    df['donchian_position'] = (df['Close'] - df['donchian_low']) / (df['donchian_high'] - df['donchian_low'])
+    df['donchian_position'] = (
+        df['Close'] - df['donchian_low']) / (df['donchian_high'] - df['donchian_low'])
 
     # --- OBV, AD, EOM, FI (z-score) ---
     for col in ['obv', 'ad', 'eom', 'fi']:
@@ -178,5 +166,21 @@ def normalize_indicators(df):
 
     # --- CMF (-1 to 1) → 0 to 1 ---
     df['cmf'] = (df['cmf'] + 1) / 2
+
+    return df
+
+
+def get_signals(df: pd.DataFrame) -> pd.DataFrame:
+
+    df = df.copy()
+
+    df = normalize_indicators(df)
+
+    df['price_shift'] = df['Close'].pct_change().dropna()
+    df['final_signal'] = 0
+    df.loc[df['price_shift'] > 0.005, 'final_signal'] = 1
+    df.loc[df['price_shift'] < -0.005, 'final_signal'] = -1
+
+    df.drop(columns=['price_shift'], inplace=True)
 
     return df
