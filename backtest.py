@@ -1,6 +1,6 @@
 from models import Operation
 
-def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int, COM: float) -> float:
+def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int) -> float:
     val = cash
 
     # Add long positions value
@@ -11,7 +11,6 @@ def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[
     # Add short positions value
     for pos in short_ops:
         pnl = (pos.price - current_price) * pos.n_shares
-
         val += pnl
 
     return val
@@ -122,7 +121,7 @@ def backtest(data):
                     )
                 )
                 
-        portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares, COM))
+        portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
 
     # Close long positions        
     for position in active_long_positions:
