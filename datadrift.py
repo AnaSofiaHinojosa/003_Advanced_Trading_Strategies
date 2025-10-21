@@ -29,3 +29,34 @@ def calculate_drift_metrics(reference_df: pd.DataFrame, new_df: pd.DataFrame, al
         drift_detected = ks_drift(reference_df[column], new_df[column], alpha)
         drift_results[column] = drift_detected
     return drift_results
+
+def run_datadrift(window_size:int, slide_size:int, df: pd.DataFrame, reference_features: pd.DataFrame, alpha: float = 0.05):
+    """
+    Run data drift detection over the dataset using a sliding window approach.
+
+    Parameters:
+        window_size (int): Size of the sliding window.
+        slide_size (int): Step size to slide the window.
+        df (pd.DataFrame): Dataset to analyze for drift.
+        reference_features (pd.DataFrame): Reference dataset for comparison.
+        alpha (float): Significance level for drift detection.
+
+    Returns:
+        List of tuples: (start_index, end_index, drift_results)
+    """
+    drift_history = []
+    for start in range(window_size, len(df), slide_size):
+        end = start + window_size
+        if end > len(df):
+         break
+        current_window = df.iloc[start:end]
+        drift_results = calculate_drift_metrics(reference_df=reference_features, new_df=current_window, alpha=alpha)
+
+        drift_results['start_idx'] = start
+        drift_results['end_idx'] = end
+        drift_history.append(drift_results)
+
+    drift_df = pd.DataFrame(drift_history)    
+
+    return drift_df
+

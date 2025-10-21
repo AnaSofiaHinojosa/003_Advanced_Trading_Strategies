@@ -1,5 +1,6 @@
+import pandas as pd
 from models import Operation
-from datadrift import calculate_drift_metrics
+from datadrift import calculate_drift_metrics, run_datadrift
 
 def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int) -> float:
     val = cash
@@ -16,7 +17,7 @@ def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[
 
     return val
 
-def backtest(data, reference_features=None):
+def backtest(data, reference_features=None, window_size:int=100, slide_size:int=50):
 
     # Trade params
     stop_loss = 0.07
@@ -50,6 +51,8 @@ def backtest(data, reference_features=None):
 
     buy = 0
     sell = 0
+
+    drift_results = []
 
     for i, row in enumerate(historic.itertuples(index=True)):
         # Close positions
@@ -129,12 +132,19 @@ def backtest(data, reference_features=None):
                 )
                 
         portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
-        '''
-        if reference_features is not None and len(reference_features) >= 90 and len(data) >= 90:
-            drift_flags = calculate_drift_metrics(reference_features, data[reference_features.columns], alpha=0.05)
-            if any(drift_flags.values()):
-                print(f"Data drift detected for dataset: {drift_flags}")
-        '''
+
+        if reference_features is not None and i+1 >= window_size + slide_size:
+            if (i+1 - window_size) % slide_size == 0:
+                drift_df = run_datadrift(window_size=window_size, 
+                                              slide_size=slide_size, 
+                                              df=historic.iloc[:i+1], 
+                                              reference_features=reference_features)
+                drift_results.append(drift_df)
+
+    if drift_results:
+        full_drift_df = pd.concat(drift_results, ignore_index=True)
+        full_drift_df = full_drift_df.drop_duplicates(subset=['start_idx', 'end_idx']).reset_index(drop=True)
+    print(full_drift_df)
 
     # Close long positions        
     for position in active_long_positions:
