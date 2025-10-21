@@ -87,8 +87,8 @@ def load_model(model_name: str, model_version: str):
     print(model.summary())
     return model
 
-def run_nn(datasets: dict, model: tf.keras.Model):
-     for dataset_name, (data, x_data) in datasets.items():
+def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+    for dataset_name, (data, x_data) in datasets.items():
         print(f"\n--- {dataset_name.upper()} ---")
         
         # --- Predict ---
@@ -98,8 +98,8 @@ def run_nn(datasets: dict, model: tf.keras.Model):
         # Evaluate the model
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
-        # --- Backtest the strategy ---
-        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data)
+        # --- Backtest the strategy with optional drift check ---
+        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data, reference_features=reference_features)
 
         # --- Show results ---
         show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)

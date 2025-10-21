@@ -1,4 +1,5 @@
 from models import Operation
+from datadrift import calculate_drift_metrics
 
 def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int) -> float:
     val = cash
@@ -15,7 +16,8 @@ def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[
 
     return val
 
-def backtest(data):
+def backtest(data, reference_features=None):
+
     # Trade params
     stop_loss = 0.07
     take_profit = 0.14
@@ -127,6 +129,12 @@ def backtest(data):
                 )
                 
         portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
+        '''
+        if reference_features is not None and len(reference_features) >= 90 and len(data) >= 90:
+            drift_flags = calculate_drift_metrics(reference_features, data[reference_features.columns], alpha=0.05)
+            if any(drift_flags.values()):
+                print(f"Data drift detected for dataset: {drift_flags}")
+        '''
 
     # Close long positions        
     for position in active_long_positions:

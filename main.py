@@ -69,7 +69,7 @@ def main():
 
     model_mlp = load_model(model_name_mlp, model_version_mlp)
 
-    run_nn(datasets, model_mlp)
+    run_nn(datasets, model_mlp, reference_features=x_train)
 
     # --- CNN ---
     model_name_cnn = 'CNNtrading'
@@ -77,6 +77,7 @@ def main():
 
     model_cnn = load_model(model_name_cnn, model_version_cnn)
 
-    run_nn(datasets, model_cnn)
+    run_nn(datasets, model_cnn, reference_features=x_train)
+
 if __name__ == "__main__":
     main()
