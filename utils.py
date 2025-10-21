@@ -99,10 +99,17 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
         # --- Backtest the strategy with optional drift check ---
-        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data, reference_features=reference_features)
+        cash, portfolio_value, win_rate, buy, sell, total_trades, full_drift_df = backtest(data, reference_features=reference_features)
 
         # --- Show results ---
         show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
 
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value)
+
+        # --- Show drift results ---
+        print("\nData Drift Results:")
+        if not full_drift_df.empty:
+            print(full_drift_df)
+        else:
+            print("No drift detected or drift analysis not performed.")

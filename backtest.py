@@ -1,6 +1,6 @@
 import pandas as pd
 from models import Operation
-from datadrift import calculate_drift_metrics, run_datadrift
+from datadrift import run_datadrift, get_most_drifted_features
 
 def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int) -> float:
     val = cash
@@ -53,6 +53,7 @@ def backtest(data, reference_features=None, window_size:int=100, slide_size:int=
     sell = 0
 
     drift_results = []
+    full_drift_df = pd.DataFrame()
 
     for i, row in enumerate(historic.itertuples(index=True)):
         # Close positions
@@ -144,7 +145,9 @@ def backtest(data, reference_features=None, window_size:int=100, slide_size:int=
     if drift_results:
         full_drift_df = pd.concat(drift_results, ignore_index=True)
         full_drift_df = full_drift_df.drop_duplicates(subset=['start_idx', 'end_idx']).reset_index(drop=True)
-    print(full_drift_df)
+    
+    most_drifted_features = get_most_drifted_features(full_drift_df) if drift_results else []
+    print(f"Most drifted features: {most_drifted_features}")
 
     # Close long positions        
     for position in active_long_positions:
@@ -172,4 +175,4 @@ def backtest(data, reference_features=None, window_size:int=100, slide_size:int=
     win_rate = positive_trades / (positive_trades + negative_trades) if (positive_trades + negative_trades) > 0 else 0
     total_trades = positive_trades + negative_trades
 
-    return cash, portfolio_value, win_rate, buy, sell, total_trades
+    return cash, portfolio_value, win_rate, buy, sell, total_trades, full_drift_df

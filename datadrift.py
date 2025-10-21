@@ -60,3 +60,21 @@ def run_datadrift(window_size:int, slide_size:int, df: pd.DataFrame, reference_f
 
     return drift_df
 
+def get_most_drifted_features(drift_results: pd.DataFrame) -> list:
+    """
+    Get a list of features that have detected drift.
+
+    Parameters:
+        drift_results (dict): Dictionary with feature names as keys and drift detection (True/False) as values.
+
+    Returns:
+        list: List of feature names that have detected drift.
+    """
+    sum = {}
+    drifted_features = []
+    df = drift_results.copy()
+    df = df.drop(columns=['Close', 'start_idx', 'end_idx'])
+    sum = {col: df[col].sum() for col in df.columns}
+    top_drifted = sorted(sum, key=sum.get, reverse=True)[:5]
+    return list(set(top_drifted))
+
