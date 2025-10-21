@@ -57,5 +57,5 @@ def trainlog():
     train_and_log_mlp(x_train, y_train, x_test, y_test, params_space_mlp, epochs=2, batch_size=32)
     train_and_log_cnn(x_train, y_train, x_test, y_test, params_space_cnn, epochs=2, batch_size=32)
 
-if __name__ == "__trainlog__":
+if __name__ == "__main__":
    trainlog()
