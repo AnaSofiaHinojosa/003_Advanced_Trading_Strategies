@@ -56,7 +56,7 @@ def main():
     # --- Train and log models ---
     # train_and_log_mlp(x_train, y_train, x_test, y_test, params_space_mlp, epochs=2, batch_size=32)
     # train_and_log_cnn(x_train, y_train, x_test, y_test, params_space_cnn, epochs=2, batch_size=32)
-    
+ 
     datasets = {
         "train": (data_train, x_train),
         "test": (data_test, x_test),
@@ -78,6 +78,5 @@ def main():
     model_cnn = load_model(model_name_cnn, model_version_cnn)
 
     run_nn(datasets, model_cnn)
-
 if __name__ == "__main__":
     main()

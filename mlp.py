@@ -1,8 +1,7 @@
 import tensorflow as tf
 import mlflow
 
-mlflow.tensorflow.autolog()
-mlflow.set_experiment("MLP Tuning")
+
 
 # Function 1: Build MLP model
 
@@ -10,6 +9,8 @@ def build_mlp_model(input_shape, params):
     """
     Build a fully-connected (MLP) model with hyperparameters.
     """
+    mlflow.tensorflow.autolog()
+    mlflow.set_experiment("MLP Tuning")
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape,)))
 

@@ -1,9 +1,6 @@
 import tensorflow as tf
 import mlflow
 
-mlflow.tensorflow.autolog()
-mlflow.set_experiment("CNN Tuning")
-
 # Function 1: Build CNN model
 
 
@@ -11,6 +8,9 @@ def build_cnn_model(input_shape, params):
     """
     Build a Convolutional Neural Network (CNN) model with hyperparameters.
     """
+    mlflow.tensorflow.autolog()
+    mlflow.set_experiment("CNN Tuning")
+
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape, 1)))
 
