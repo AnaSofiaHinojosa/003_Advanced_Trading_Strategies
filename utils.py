@@ -1,7 +1,11 @@
 import yfinance as yf
 import pandas as pd
+import numpy as np
 import mlflow.tensorflow
+import tensorflow as tf
 from metrics import evaluate_metrics
+from backtest import backtest
+from plots import plot_portfolio_value
 
 # 15 years of data
 
@@ -82,3 +86,23 @@ def load_model(model_name: str, model_version: str):
     )
     print(model.summary())
     return model
+
+def run_nn(datasets: dict, model: tf.keras.Model):
+     for dataset_name, (data, x_data) in datasets.items():
+        print(f"\n--- {dataset_name.upper()} ---")
+        
+        # --- Predict ---
+        y_pred = model.predict(x_data)
+        y_pred_classes = np.argmax(y_pred, axis=1)
+
+        # Evaluate the model
+        data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
+
+        # --- Backtest the strategy ---
+        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data)
+
+        # --- Show results ---
+        show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
+
+        # --- Plot portfolio value ---
+        plot_portfolio_value(portfolio_value)

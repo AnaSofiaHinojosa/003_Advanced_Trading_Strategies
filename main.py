@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-from utils import get_data, split_data, get_target, show_results, load_model
+from utils import get_data, split_data, get_target, show_results, load_model, run_nn
 from backtest import backtest
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
@@ -57,48 +57,27 @@ def main():
     # train_and_log_mlp(x_train, y_train, x_test, y_test, params_space_mlp, epochs=2, batch_size=32)
     # train_and_log_cnn(x_train, y_train, x_test, y_test, params_space_cnn, epochs=2, batch_size=32)
     
+    datasets = {
+        "train": (data_train, x_train),
+        "test": (data_test, x_test),
+        "val": (data_val, x_val)
+    }
+
     # --- MLP ---
-    model_name = 'MLPtrading'
-    model_version = 'latest'
+    model_name_mlp = 'MLPtrading'
+    model_version_mlp = 'latest'
 
-    model = load_model(model_name, model_version)
+    model_mlp = load_model(model_name_mlp, model_version_mlp)
 
-    y_pred = model.predict(x_test)
-    y_pred_classes = np.argmax(y_pred, axis=1)
-    
-    # Evaluate the model
-    data_test['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
-
-    # --- Backtest the strategy ---
-    cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data_test)
-
-    # --- Show results ---
-    show_results(data_test, buy, sell, total_trades, win_rate, portfolio_value, cash)
-
-    # --- Plot portfolio value ---
-    plot_portfolio_value(portfolio_value)
+    run_nn(datasets, model_mlp)
 
     # --- CNN ---
-
     model_name_cnn = 'CNNtrading'
     model_version_cnn = 'latest'
 
-    model = load_model(model_name_cnn, model_version_cnn)
+    model_cnn = load_model(model_name_cnn, model_version_cnn)
 
-    y_pred = model.predict(x_test)
-    y_pred_classes = np.argmax(y_pred, axis=1)
-
-    # Evaluate the model
-    data_test['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
-
-    # --- Backtest the strategy ---
-    cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data_test)
-
-    # --- Show results ---
-    show_results(data_test, buy, sell, total_trades, win_rate, portfolio_value, cash)
-
-    # --- Plot portfolio value ---
-    plot_portfolio_value(portfolio_value)
+    run_nn(datasets, model_cnn)
 
 if __name__ == "__main__":
     main()
