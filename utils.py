@@ -87,7 +87,7 @@ def load_model(model_name: str, model_version: str):
     print(model.summary())
     return model
 
-def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None, plot: bool = True):
     for dataset_name, (data, x_data) in datasets.items():
         print(f"\n--- {dataset_name.upper()} ---")
         
@@ -101,8 +101,27 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         # --- Backtest the strategy with optional drift check ---
         cash, portfolio_value, win_rate, buy, sell, total_trades, full_drift_df = backtest(data, reference_features=reference_features)
 
-        # --- Show results ---
-        show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
+        if plot:
 
-        # --- Plot portfolio value ---
-        plot_portfolio_value(portfolio_value)
+            # --- Show results ---
+            show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
+
+            # --- Plot portfolio value ---
+            plot_portfolio_value(portfolio_value)
+
+        return full_drift_df
+
+def run_nn_ipynb(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+    for dataset_name, (data, x_data) in datasets.items():
+        
+        # --- Predict ---
+        y_pred = model.predict(x_data)
+        y_pred_classes = np.argmax(y_pred, axis=1)
+
+        # Evaluate the model
+        data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
+
+        # --- Backtest the strategy with optional drift check ---
+        cash, portfolio_value, win_rate, buy, sell, total_trades, full_drift_df = backtest(data, reference_features=reference_features)
+
+        return full_drift_df

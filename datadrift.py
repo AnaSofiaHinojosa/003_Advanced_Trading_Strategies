@@ -30,6 +30,7 @@ def calculate_drift_metrics(reference_df: pd.DataFrame, new_df: pd.DataFrame, al
         drift_results[column] = drift_detected
     return drift_results
 
+
 def run_datadrift(window_size:int, slide_size:int, df: pd.DataFrame, reference_features: pd.DataFrame, alpha: float = 0.05):
     """
     Run data drift detection over the dataset using a sliding window approach.
