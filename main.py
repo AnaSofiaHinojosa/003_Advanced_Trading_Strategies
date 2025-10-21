@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 from utils import get_data, split_data, get_target
 from backtest import backtest
@@ -7,6 +8,8 @@ from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
 from metrics import evaluate_metrics
 from plots import plot_portfolio_value
+from mlp import train_and_log_mlp
+import mlflow
 
 
 def main():
@@ -28,7 +31,7 @@ def main():
     x_train, y_train = get_target(data_train)
     
     # --- Normalize new data ---
-    
+
     data_test = add_all_indicators(data_test)
     data_test = get_signals(data_test)
     data_test = normalize_new_data(data_test, params)
@@ -40,12 +43,37 @@ def main():
     data_val = data_val.dropna()
 
     # --- Separate characteristics for test and validation sets ---
-    x_test, _ = get_target(data_test)
-    x_val, _ = get_target(data_val)
+    x_test, y_test = get_target(data_test)
+    x_val, y_val = get_target(data_val)
+
+    # --- MLP model training and logging ---
+    params_space = [
+    {"dense_layers": 2, "dense_units": 128, "activation": "relu", "optimizer": "adam"},
+    {"dense_layers": 3, "dense_units": 64, "activation": "relu", "optimizer": "adam"},
+    {"dense_layers": 2, "dense_units": 64, "activation": "sigmoid", "optimizer": "adam"},
+    ]
+
+    # Train and log models
+    # train_and_log_mlp(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32)
+
+    model_name = 'MLPtrading'
+    model_version = 'latest'
+
+    model = mlflow.tensorflow.load_model(
+        model_uri=f"models:/{model_name}/{model_version}"
+    )
+    print(model.summary())
+
+    y_pred = model.predict(x_test)
+    y_pred_classes = np.argmax(y_pred, axis=1)
+    
+    # Evaluate the model
+    data_test['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
+    print(data_test)
 
     # --- Backtest the strategy ---
-    cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data_train)
-    holds = len(data_train) - (buy + sell)
+    cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data_test)
+    holds = len(data_test) - (buy + sell)
     print(f"Total buy signals: {buy}")
     print(f"Total sell signals: {sell}")
     print(f"Total trades: {total_trades}")

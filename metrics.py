@@ -18,7 +18,7 @@ def sharpe_ratio(portfolio_values: pd.Series) -> float:
     std = returns.std()
 
     # Annualized
-    intervals = 365 * 24 * 60 / 60  # Daily intervals in 1-hour data
+    intervals = 252
     annual_rets = mean * intervals
     annual_std = std * np.sqrt(intervals)
 
@@ -41,7 +41,7 @@ def sortino_ratio(portfolio_values: pd.Series) -> float:
     downside = np.minimum(returns, 0).std()
 
     # Annualized
-    intervals = 365 * 24 * 60 / 60  # Daily intervals in 1-hour data
+    intervals = 252
     annual_rets = mean * intervals
     annual_downside = downside * np.sqrt(intervals)
 
@@ -80,7 +80,7 @@ def calmar_ratio(portfolio_values: pd.Series) -> float:
     mean = returns.mean()
 
     # Annualized
-    intervals = 365 * 24 * 60 / 60  # Daily intervals in 1-hour data
+    intervals = 252
     annual_rets = mean * intervals
 
     # Max Drawdown
