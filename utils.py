@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import mlflow.tensorflow
 from metrics import evaluate_metrics
 
 # 15 years of data
@@ -74,3 +75,10 @@ def show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
 
     print(f"Cash: ${cash:,.2f}")
     print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
+
+def load_model(model_name: str, model_version: str):
+    model = mlflow.tensorflow.load_model(
+        model_uri=f"models:/{model_name}/{model_version}"
+    )
+    print(model.summary())
+    return model

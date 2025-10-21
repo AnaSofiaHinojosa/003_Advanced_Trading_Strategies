@@ -2,13 +2,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-from utils import get_data, split_data, get_target, show_results
+from utils import get_data, split_data, get_target, show_results, load_model
 from backtest import backtest
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
 from metrics import evaluate_metrics
 from plots import plot_portfolio_value
 from mlp import train_and_log_mlp
+from params import get_mlp_params
 import mlflow
 
 
@@ -47,11 +48,7 @@ def main():
     x_val, y_val = get_target(data_val)
 
     # --- MLP model training and logging ---
-    params_space = [
-    {"dense_layers": 2, "dense_units": 128, "activation": "relu", "optimizer": "adam"},
-    {"dense_layers": 3, "dense_units": 64, "activation": "relu", "optimizer": "adam"},
-    {"dense_layers": 2, "dense_units": 64, "activation": "sigmoid", "optimizer": "adam"},
-    ]
+    params_space = get_mlp_params()
 
     # Train and log models
     # train_and_log_mlp(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32)
@@ -59,10 +56,7 @@ def main():
     model_name = 'MLPtrading'
     model_version = 'latest'
 
-    model = mlflow.tensorflow.load_model(
-        model_uri=f"models:/{model_name}/{model_version}"
-    )
-    print(model.summary())
+    model = load_model(model_name, model_version)
 
     y_pred = model.predict(x_test)
     y_pred_classes = np.argmax(y_pred, axis=1)
