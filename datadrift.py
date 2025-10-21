@@ -60,7 +60,7 @@ def run_datadrift(window_size:int, slide_size:int, df: pd.DataFrame, reference_f
 
     return drift_df
 
-def get_most_drifted_features(drift_results: pd.DataFrame) -> list:
+def get_most_drifted_features(drift_results: pd.DataFrame, top_n: int = 5) -> list:
     """
     Get a list of features that have detected drift.
 
@@ -70,11 +70,17 @@ def get_most_drifted_features(drift_results: pd.DataFrame) -> list:
     Returns:
         list: List of feature names that have detected drift.
     """
-    sum = {}
-    drifted_features = []
     df = drift_results.copy()
-    df = df.drop(columns=['Close', 'start_idx', 'end_idx'])
-    sum = {col: df[col].sum() for col in df.columns}
-    top_drifted = sorted(sum, key=sum.get, reverse=True)[:5]
-    return list(set(top_drifted))
+
+    # Remove columns not related to features
+    df = df.drop(columns=['start_idx', 'end_idx', 'Close'], errors='ignore')
+
+    # Sum True values per feature (number of times drift detected)
+    drift_counts = {col: int(df[col].sum()) for col in df.columns if df[col].dtype == bool}
+
+    # Sort features by drift count (descending)
+    sorted_drift = sorted(drift_counts.items(), key=lambda x: x[1], reverse=True)
+
+    # Return top N features
+    return sorted_drift[:top_n]
 

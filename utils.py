@@ -106,10 +106,3 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
 
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value)
-
-        # --- Show drift results ---
-        print("\nData Drift Results:")
-        if not full_drift_df.empty:
-            print(full_drift_df)
-        else:
-            print("No drift detected or drift analysis not performed.")
