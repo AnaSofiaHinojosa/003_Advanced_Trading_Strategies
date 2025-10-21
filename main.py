@@ -26,8 +26,9 @@ def main():
 
     # --- Separate target variable ---
     x_train, y_train = get_target(data_train)
-
+    
     # --- Normalize new data ---
+    
     data_test = add_all_indicators(data_test)
     data_test = get_signals(data_test)
     data_test = normalize_new_data(data_test, params)
