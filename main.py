@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-from utils import get_data, split_data, get_target
+from utils import get_data, split_data, get_target, show_results
 from backtest import backtest
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
@@ -73,18 +73,9 @@ def main():
 
     # --- Backtest the strategy ---
     cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data_test)
-    holds = len(data_test) - (buy + sell)
-    print(f"Total buy signals: {buy}")
-    print(f"Total sell signals: {sell}")
-    print(f"Total trades: {total_trades}")
-    print(f"Total holds: {holds}")
 
-    print(f"Win rate: {win_rate:.2%}")
-    print("Performance metrics:")
-    print(evaluate_metrics(pd.Series(portfolio_value)))
-
-    print(f"Cash: ${cash:,.2f}")
-    print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
+    # --- Show results ---
+    show_results(data_test, buy, sell, total_trades, win_rate, portfolio_value, cash)
 
     # --- Plot portfolio value ---
     plot_portfolio_value(portfolio_value)

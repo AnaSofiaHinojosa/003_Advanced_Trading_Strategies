@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+from metrics import evaluate_metrics
 
 # 15 years of data
 
@@ -59,3 +60,17 @@ def get_target(data:pd.DataFrame) -> pd.Series:
         y = data['final_signal']
         X = data.drop(columns=['final_signal', 'Open', 'High', 'Low', 'Volume'])
         return X, y
+
+def show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash):
+    holds = len(data) - (buy + sell)
+    print(f"Total buy signals: {buy}")
+    print(f"Total sell signals: {sell}")
+    print(f"Total trades: {total_trades}")
+    print(f"Total holds: {holds}")
+
+    print(f"Win rate: {win_rate:.2%}")
+    print("Performance metrics:")
+    print(evaluate_metrics(pd.Series(portfolio_value)))
+
+    print(f"Cash: ${cash:,.2f}")
+    print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
