@@ -48,28 +48,11 @@ def main():
     # --- Separate characteristics for test and validation sets ---
     x_test, y_test = get_target(data_test)
     x_val, y_val = get_target(data_val)
- 
-    datasets = {
-        "train": (data_train, x_train),
-        "test": (data_test, x_test),
-        "val": (data_val, x_val)
-    }
 
-    # --- MLP ---
-    model_name_mlp = 'MLPtrading'
-    model_version_mlp = 'latest'
+    # --- MLP model training and logging ---
+    params_space_mlp = get_mlp_params()
+    params_space_cnn = get_cnn_params()
 
-    model_mlp = load_model(model_name_mlp, model_version_mlp)
-
-    run_nn(datasets, model_mlp, reference_features=x_train)
-
-    # --- CNN ---
-    model_name_cnn = 'CNNtrading'
-    model_version_cnn = 'latest'
-
-    model_cnn = load_model(model_name_cnn, model_version_cnn)
-
-    run_nn(datasets, model_cnn, reference_features=x_train)
-
-if __name__ == "__main__":
-    main()
+    # --- Train and log models ---
+    train_and_log_mlp(x_train, y_train, x_test, y_test, params_space_mlp, epochs=2, batch_size=32)
+    train_and_log_cnn(x_train, y_train, x_test, y_test, params_space_cnn, epochs=2, batch_size=32)
