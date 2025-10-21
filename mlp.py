@@ -4,9 +4,8 @@ import mlflow
 mlflow.tensorflow.autolog()
 mlflow.set_experiment("MLP Tuning")
 
-# ----------------------------
 # Function 1: Build MLP model
-# ----------------------------
+
 def build_mlp_model(input_shape, params):
     """
     Build a fully-connected (MLP) model with hyperparameters.
@@ -31,9 +30,8 @@ def build_mlp_model(input_shape, params):
                   metrics=['accuracy'])
     return model
 
-# ---------------------------------------
 # Function 2: Train and log with MLflow
-# ---------------------------------------
+
 def train_and_log_mlp(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32):
     """
     Train multiple MLP configurations and log results to MLflow.
