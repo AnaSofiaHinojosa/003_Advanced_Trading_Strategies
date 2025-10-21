@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/sofia/Desktop/se%CC%81ptimo/003_Advanced_Trading_Strategies/mlruns/289684785886022669/372e91c3a2cf46c88c0c9171b3a2246d/artifacts
+end_time: 1761011819226
+entry_point_name: ''
+experiment_id: '289684785886022669'
+lifecycle_stage: active
+run_id: 372e91c3a2cf46c88c0c9171b3a2246d
+run_name: dense3_units64_activationrelu
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761011813976
+status: 3
+tags: []
+user_id: ivannaherrera

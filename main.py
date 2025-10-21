@@ -11,6 +11,8 @@ from plots import plot_portfolio_value
 from mlp import train_and_log_mlp
 from params import get_mlp_params
 import mlflow
+import os
+import mlflow.tensorflow
 
 
 def main():
@@ -50,13 +52,15 @@ def main():
     # --- MLP model training and logging ---
     params_space = get_mlp_params()
 
-    # Train and log models
-    # train_and_log_mlp(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32)
+    # --- Train and log models ---
+    #train_and_log_mlp(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32)
+
+    mlflow.set_tracking_uri("http://148.201.163.89:5001")
 
     model_name = 'MLPtrading'
     model_version = 'latest'
 
-    model = load_model(model_name, model_version)
+    model = mlflow.tensorflow.load_model(f"models:/{model_name}/{model_version}")
 
     y_pred = model.predict(x_test)
     y_pred_classes = np.argmax(y_pred, axis=1)
