@@ -96,8 +96,6 @@ with st.sidebar:
     st.header("Settings")
     ticker = st.text_input("Ticker", value="AAPL")
     alpha = st.number_input("Significance level (alpha)", min_value=1e-6, max_value=0.2, value=0.05, step=0.01)
-    window_size = st.number_input("Drift window size", min_value=20, max_value=1000, value=100, step=10)
-    slide_size = st.number_input("Slide size", min_value=5, max_value=500, value=50, step=5)
     run_btn = st.button("Run Backtest & Drift Analysis")
 
 
