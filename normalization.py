@@ -52,6 +52,11 @@ def normalize_indicators(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     params['max_cmf'] = df['cmf'].max()
     df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
 
+    # --- Close ---
+    params['mean_close'] = df['Close'].mean()
+    params['std_close'] = df['Close'].std()
+    df['Close'] = (df['Close'] - params['mean_close']) / params['std_close']
+
     df = df.drop(columns=['bb_upper', 'bb_lower',
                           'kc_upper', 'kc_lower',
                           'donchian_high', 'donchian_low'])
@@ -97,6 +102,9 @@ def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
 
     # --- CMF (-1 to 1) → 0 to 1 ---
     df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
+
+    # --- Close ---
+    df['Close'] = (df['Close'] - params['mean_close']) / params['std_close']
 
     df = df.drop(columns=['bb_upper', 'bb_lower',
                         'kc_upper', 'kc_lower',
