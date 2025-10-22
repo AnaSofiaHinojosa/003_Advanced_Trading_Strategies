@@ -1,18 +1,6 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-
-from utils import get_data, split_data, get_target, show_results, load_model, run_nn
-from backtest import backtest
+from utils import get_data, split_data, get_target, load_model, run_nn
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
-from metrics import evaluate_metrics
-from plots import plot_portfolio_value
-from mlp import train_and_log_mlp
-from params import get_mlp_params, get_cnn_params
-from cnn import train_and_log_cnn
-import mlflow
-import mlflow.tensorflow
 
 
 def main():
