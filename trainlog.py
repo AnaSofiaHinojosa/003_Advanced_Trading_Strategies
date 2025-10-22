@@ -1,13 +1,6 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-
-from utils import get_data, split_data, get_target, show_results, load_model, run_nn
-from backtest import backtest
+from utils import get_data, split_data, get_target
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
-from metrics import evaluate_metrics
-from plots import plot_portfolio_value
 from mlp import train_and_log_mlp
 from params import get_mlp_params, get_cnn_params
 from cnn import train_and_log_cnn
@@ -16,6 +9,8 @@ import mlflow.tensorflow
 
 
 def trainlog():
+    mlflow.tensorflow.autolog()
+
     # --- Load data ---
     data = get_data("AAPL")
 
@@ -54,7 +49,10 @@ def trainlog():
     params_space_cnn = get_cnn_params()
 
     # --- Train and log models ---
+    mlflow.set_experiment("MLP Tuning")
     train_and_log_mlp(x_train, y_train, x_test, y_test, params_space_mlp, epochs=2, batch_size=32)
+
+    mlflow.set_experiment("CNN Tuning")
     train_and_log_cnn(x_train, y_train, x_test, y_test, params_space_cnn, epochs=2, batch_size=32)
 
 if __name__ == "__main__":
