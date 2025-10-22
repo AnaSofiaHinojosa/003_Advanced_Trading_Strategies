@@ -1,7 +1,3 @@
-# dashboard.py
-# Streamlit Data Drift Dashboard
-# Runs backtests on TEST and VAL, then computes all drift analytics in the dashboard
-
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -16,7 +12,6 @@ from utils import get_data, split_data, get_target, load_model
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data
 from backtest import backtest
-
 
 # =============================================================================
 # Helper functions for dashboard plots
