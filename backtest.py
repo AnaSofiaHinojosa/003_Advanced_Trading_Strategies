@@ -16,7 +16,7 @@ def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[
 
     return val
 
-def backtest(data, reference_features=None):
+def backtest(data, reference_features=None, compare_features=None):
 
     # Trade params
     stop_loss = 0.07

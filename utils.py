@@ -5,7 +5,7 @@ import mlflow.tensorflow
 import tensorflow as tf
 from metrics import evaluate_metrics
 from backtest import backtest
-from plots import plot_portfolio_value
+from plots import plot_portfolio_value, plot_trade_distribution
 
 # 15 years of data
 
@@ -99,10 +99,15 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
         # --- Backtest the strategy with optional drift check ---
-        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data, reference_features=reference_features)
+        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data, 
+                                                                            reference_features=reference_features, 
+                                                                            compare_features=x_data)
 
         # --- Show results ---
         show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
+
+        # --- Plot trade distribution ---
+        plot_trade_distribution(buy, sell, total_trades - (buy + sell), section=dataset_name)
 
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value, section=dataset_name)
