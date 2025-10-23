@@ -5,7 +5,7 @@ from normalization import normalize_indicators, normalize_new_data
 
 def main():
     # --- Load data ---
-    data = get_data("AAPL")
+    data = get_data("HP")
 
     # --- Split data ---
     data_train, data_test, data_val = split_data(data)

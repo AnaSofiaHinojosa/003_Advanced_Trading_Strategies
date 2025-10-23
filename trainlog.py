@@ -12,7 +12,7 @@ def trainlog():
     mlflow.tensorflow.autolog()
 
     # --- Load data ---
-    data = get_data("AAPL")
+    data = get_data("HP")
 
     # --- Split data ---
     data_train, data_test, data_val = split_data(data)
