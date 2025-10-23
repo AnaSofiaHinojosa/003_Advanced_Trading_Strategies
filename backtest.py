@@ -75,8 +75,9 @@ def backtest(data, reference_features=None):
         # Close positions
         for position in active_short_positions.copy():
             if row.Close < position.take_profit or row.Close > position.stop_loss:
-                pnl = (position.price - row.Close) * position.n_shares * (1 - COM)
-                cash += pnl
+                pnl = (position.price - row.Close) * position.n_shares
+                short_com = row.Close * position.n_shares * COM
+                cash += pnl - short_com
                 # Add to win/loss count
                 if pnl >= 0:
                     positive_trades += 1
