@@ -125,7 +125,7 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def get_signals(df: pd.DataFrame, alpha: float) -> pd.DataFrame:
+def get_signals(df: pd.DataFrame, alpha: float = 0.02) -> pd.DataFrame:
 
     df = df.copy()
 

@@ -8,7 +8,7 @@ def plot_portfolio_value(portfolio_value: list, section) -> None:
         portfolio_value (list): List of portfolio values over time.
     """
 
-    colors = {'train': 'palevioletred', 'test': 'cadetblue', 'validation': 'mediumpurple'}
+    colors = {'train': 'palevioletred', 'test': 'cadetblue', 'val': 'mediumpurple'}
     color = colors[section]
 
     plt.figure(figsize=(12, 6))
