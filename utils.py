@@ -105,4 +105,4 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
 
         # --- Plot portfolio value ---
-        plot_portfolio_value(portfolio_value)
+        plot_portfolio_value(portfolio_value, section=dataset_name)

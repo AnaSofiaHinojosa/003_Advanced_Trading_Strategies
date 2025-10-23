@@ -14,7 +14,7 @@ def main():
     data_train = add_all_indicators(data_train)
 
     # --- Generate trading signals ---
-    data_train = get_signals(data_train)
+    data_train = get_signals(data_train, alpha=0.02)
     data_train, params = normalize_indicators(data_train)
     data_train = data_train.dropna()
 

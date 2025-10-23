@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def plot_portfolio_value(portfolio_value: list) -> None:
+def plot_portfolio_value(portfolio_value: list, section) -> None:
     """
     Plot the portfolio value over time.
 
@@ -8,9 +8,12 @@ def plot_portfolio_value(portfolio_value: list) -> None:
         portfolio_value (list): List of portfolio values over time.
     """
 
+    colors = {'train': 'palevioletred', 'test': 'cadetblue', 'validation': 'mediumpurple'}
+    color = colors[section]
+
     plt.figure(figsize=(12, 6))
-    plt.plot(portfolio_value, label="Portfolio value", color="palevioletred")
-    plt.title("Portfolio value over time")
+    plt.plot(portfolio_value, color=color)
+    plt.title(f'Portfolio value over time ({section})')
     plt.xlabel("Time")
     plt.ylabel("Portfolio value")
     plt.legend()
