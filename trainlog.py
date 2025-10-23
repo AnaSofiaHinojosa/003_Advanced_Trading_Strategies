@@ -12,7 +12,7 @@ def trainlog():
     mlflow.tensorflow.autolog()
 
     # --- Load data ---
-    data = get_data("AAPL")
+    data = get_data("HP")
 
     # --- Split data ---
     data_train, data_test, data_val = split_data(data)
@@ -21,10 +21,10 @@ def trainlog():
     data_train = add_all_indicators(data_train)
 
     # --- Generate trading signals ---
-    data_train = get_signals(data_train)
+    data_train = get_signals(data_train, alpha=0.02)
     data_train, params = normalize_indicators(data_train)
     data_train = data_train.dropna()
-
+    
     # --- Separate target variable ---
     x_train, y_train = get_target(data_train)
     

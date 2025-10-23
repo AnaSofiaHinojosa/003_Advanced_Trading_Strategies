@@ -125,15 +125,14 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def get_signals(df: pd.DataFrame) -> pd.DataFrame:
+def get_signals(df: pd.DataFrame, alpha: float = 0.01) -> pd.DataFrame:
 
     df = df.copy()
 
     df['future_price'] = df['Close'].shift(-5)
     df['final_signal'] = 0
-    alpha = 0.005
-    df.loc[df[df.columns[0]] * (1+alpha) < df['future_price'], 'final_signal'] = 1
-    df.loc[df[df.columns[0]] * (1-alpha) > df['future_price'], 'final_signal'] = -1
+    df.loc[df['Close'] * (1+alpha) < df['future_price'], 'final_signal'] = 1
+    df.loc[df['Close'] * (1-alpha) > df['future_price'], 'final_signal'] = -1
 
     df.drop(columns=['future_price'], inplace=True)
 

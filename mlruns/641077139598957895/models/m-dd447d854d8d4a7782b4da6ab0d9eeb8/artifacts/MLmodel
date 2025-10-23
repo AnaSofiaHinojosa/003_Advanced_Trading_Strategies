@@ -1,0 +1,22 @@
+artifact_path: file:///Users/sofia/Desktop/se%CC%81ptimo/003_Advanced_Trading_Strategies/mlruns/641077139598957895/models/m-dd447d854d8d4a7782b4da6ab0d9eeb8/artifacts
+flavors:
+  python_function:
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.tensorflow
+    python_version: 3.12.12
+  tensorflow:
+    code: null
+    data: data
+    keras_version: 2.16.2
+    model_type: keras
+    save_format: tf
+mlflow_version: 3.4.0
+model_id: m-dd447d854d8d4a7782b4da6ab0d9eeb8
+model_size_bytes: 312641
+model_uuid: m-dd447d854d8d4a7782b4da6ab0d9eeb8
+prompts: null
+run_id: 285f9d6fb40e44fb9206588dd4d5d1b1
+utc_time_created: '2025-10-23 20:00:38.864198'
