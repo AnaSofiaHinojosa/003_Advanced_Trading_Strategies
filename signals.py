@@ -129,11 +129,12 @@ def get_signals(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df['price_shift'] = df['Close'].pct_change().dropna()
+    df['future_price'] = df['Close'].shift(-5)
     df['final_signal'] = 0
-    df.loc[df['price_shift'] > 0.005, 'final_signal'] = 1
-    df.loc[df['price_shift'] < -0.005, 'final_signal'] = -1
+    alpha = 0.005
+    df.loc[df[df.columns[0]] * (1+alpha) < df['future_price'], 'final_signal'] = 1
+    df.loc[df[df.columns[0]] * (1-alpha) > df['future_price'], 'final_signal'] = -1
 
-    df.drop(columns=['price_shift'], inplace=True)
+    df.drop(columns=['future_price'], inplace=True)
 
     return df
