@@ -130,12 +130,6 @@ def backtest(data, reference_features=None, compare_features=None):
                 )
                 
         portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
-        '''
-        if reference_features is not None and len(reference_features) >= 90 and len(data) >= 90:
-            drift_flags = calculate_drift_metrics(reference_features, data[reference_features.columns], alpha=0.05)
-            if any(drift_flags.values()):
-                print(f"Data drift detected for dataset: {drift_flags}")
-        '''
 
     # Close long positions        
     for position in active_long_positions:

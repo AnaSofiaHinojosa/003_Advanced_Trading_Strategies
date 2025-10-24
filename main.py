@@ -15,9 +15,9 @@ def main():
 
     # --- Generate trading signals ---
     data_train = get_signals(data_train, alpha=0.02)
-    data_train, params = normalize_indicators(data_train)
+    data_train_bt, params = normalize_indicators(data_train)
     data_train_norm, params_norm = normalize_indicators_price(data_train)
-    data_train = data_train.dropna()
+    data_train_bt = data_train_bt.dropna()
     data_train_norm = data_train_norm.dropna()
 
     # --- Separate target variable ---
@@ -27,16 +27,16 @@ def main():
 
     data_test = add_all_indicators(data_test)
     data_test = get_signals(data_test)
-    data_test = normalize_new_data(data_test, params)
+    data_test_bt = normalize_new_data(data_test, params)
     data_test_norm = normalize_new_data_price(data_test, params_norm)
-    data_test = data_test.dropna()
+    data_test_bt = data_test_bt.dropna()
     data_test_norm = data_test_norm.dropna()
 
     data_val = add_all_indicators(data_val)
     data_val = get_signals(data_val)
-    data_val = normalize_new_data(data_val, params)
+    data_val_bt = normalize_new_data(data_val, params)
     data_val_norm = normalize_new_data_price(data_val, params_norm)
-    data_val = data_val.dropna()
+    data_val_bt = data_val_bt.dropna()
     data_val_norm = data_val_norm.dropna()
 
     # --- Separate characteristics for test and validation sets ---
@@ -44,9 +44,9 @@ def main():
     x_val_norm, y_val_norm = get_target(data_val_norm)
 
     datasets = {
-        "train": (data_train, x_train_norm),
-        "test": (data_test, x_test_norm),
-        "val": (data_val, x_val_norm)
+        "train": (data_train_bt, x_train_norm),
+        "test": (data_test_bt, x_test_norm),
+        "val": (data_val_bt, x_val_norm)
     }
 
     # --- MLP ---
