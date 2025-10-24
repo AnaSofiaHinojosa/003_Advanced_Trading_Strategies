@@ -48,6 +48,7 @@ def main():
         "test": (data_test_bt, x_test_norm),
         "val": (data_val_bt, x_val_norm)
     }
+    
 
     # --- MLP ---
     model_name_mlp = 'MLPtrading'
