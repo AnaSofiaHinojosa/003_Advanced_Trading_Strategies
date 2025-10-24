@@ -6,7 +6,7 @@ import tensorflow as tf
 from metrics import evaluate_metrics
 from backtest import backtest
 from plots import plot_portfolio_value
-
+import warnings
 # 15 years of data
 
 def get_data(ticker: str) -> pd.DataFrame:
@@ -80,11 +80,20 @@ def show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
     print(f"Cash: ${cash:,.2f}")
     print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
 
+
 def load_model(model_name: str, model_version: str):
-    model = mlflow.tensorflow.load_model(
-        model_uri=f"models:/{model_name}/{model_version}"
-    )
-    print(model.summary())
+    """
+    Load an MLflow TensorFlow/Keras model for inference.
+    Skips optimizer to avoid variable mismatch warnings.
+    """
+    model_uri = f"models:/{model_name}/{model_version}"
+
+    # Suppress optimizer variable warnings
+    warnings.filterwarnings("ignore", category=UserWarning)
+
+    # Load the model (MLflow auto-loads the Keras model)
+    model = mlflow.tensorflow.load_model(model_uri=model_uri)
+
     return model
 
 def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None, plot: bool = True):

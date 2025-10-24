@@ -125,6 +125,7 @@ def run_model_analysis(model_name, ds, alpha, ticker):
     model_ver = "latest"
     model = load_model(model_name, model_ver)
 
+
     drift_results = {}
     for split in ["test", "val"]:
         data, x_data = ds[split]
