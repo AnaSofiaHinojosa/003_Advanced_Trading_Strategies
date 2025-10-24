@@ -40,6 +40,6 @@ def plot_trade_distribution(buy: int, sell: int, hold: int, section: str) -> Non
     plt.figure(figsize=(8, 8))
     plt.pie(values, labels=labels, colors=colors,
             autopct='%1.1f%%', startangle=140, explode=explode)
-    plt.title(f'Trade Distribution ({section})')
+    plt.title(f'Trade distribution ({section})')
     plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     plt.show()
