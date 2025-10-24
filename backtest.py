@@ -50,6 +50,7 @@ def backtest(data, reference_features=None, compare_features=None):
 
     buy = 0
     sell = 0
+    hold = 0
 
     for i, row in enumerate(historic.itertuples(index=True)):
         # Close positions
@@ -128,6 +129,8 @@ def backtest(data, reference_features=None, compare_features=None):
                     type="SHORT"
                     )
                 )
+        else:
+            hold += 1        
                 
         portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
 
@@ -158,4 +161,4 @@ def backtest(data, reference_features=None, compare_features=None):
     win_rate = positive_trades / (positive_trades + negative_trades) if (positive_trades + negative_trades) > 0 else 0
     total_trades = positive_trades + negative_trades
 
-    return cash, portfolio_value, win_rate, buy, sell, total_trades
+    return cash, portfolio_value, win_rate, buy, sell, hold, total_trades

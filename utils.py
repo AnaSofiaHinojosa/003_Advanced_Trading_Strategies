@@ -66,8 +66,8 @@ def get_target(data:pd.DataFrame) -> pd.Series:
         X = data.drop(columns=['final_signal', 'Open', 'High', 'Low', 'Volume'])
         return X, y
 
-def show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash):
-    holds = len(data) - (buy + sell)
+def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash):
+    holds = hold
     print(f"Total buy signals: {buy}")
     print(f"Total sell signals: {sell}")
     print(f"Total trades: {total_trades}")
@@ -99,15 +99,15 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
         # --- Backtest the strategy with optional drift check ---
-        cash, portfolio_value, win_rate, buy, sell, total_trades = backtest(data, 
+        cash, portfolio_value, win_rate, buy, sell, hold, total_trades = backtest(data, 
                                                                             reference_features=reference_features, 
                                                                             compare_features=x_data)
 
         # --- Show results ---
-        show_results(data, buy, sell, total_trades, win_rate, portfolio_value, cash)
+        show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash)
 
         # --- Plot trade distribution ---
-        plot_trade_distribution(buy, sell, total_trades - (buy + sell), section=dataset_name)
+        plot_trade_distribution(buy, sell, hold, section=dataset_name)
 
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value, section=dataset_name)
