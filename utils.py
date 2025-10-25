@@ -165,3 +165,25 @@ def most_drifted_features(drift_results: dict, p_values: dict, top_n: int = 5, p
             windows_drifted = sum(1 for window in pvals_windows if window.get(feat, np.nan) < 0.05)
         results.append({"Feature": feat, "P-Value": avg_pval, "Windows Drifted": windows_drifted})
     return pd.DataFrame(results)
+
+def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
+    """
+    Create a statistics table summarizing drift results.
+
+    Parameters:
+        drift_flags (dict): Dictionary with feature names as keys and drift status (True/False) as values.
+        p_values (dict): Dictionary with feature names as keys and p-values as values.
+
+    Returns:
+        pd.DataFrame: DataFrame summarizing drift results.
+    """
+    data = {
+        "Feature": [],
+        "Drift Detected": [],
+        "P-Value": []
+    }
+    for feature, drifted in drift_flags.items():
+        data["Feature"].append(feature)
+        data["Drift Detected"].append(drifted)
+        data["P-Value"].append(p_values.get(feature, np.nan))
+    return pd.DataFrame(data)
