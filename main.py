@@ -1,3 +1,4 @@
+# Entrypoint
 from utils import get_data, split_data, get_target, load_model, run_nn
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data, normalize_indicators_price, normalize_new_data_price

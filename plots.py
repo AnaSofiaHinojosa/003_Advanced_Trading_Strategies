@@ -8,6 +8,7 @@ def plot_portfolio_value(portfolio_value: list, section: str) -> None:
 
     Parameters:
         portfolio_value (list): List of portfolio values over time.
+        section (str): Section name (train, test, val).
     """
 
     colors = {'train': 'steelblue', 'test': 'palevioletred', 'val': 'indianred'}
@@ -24,7 +25,7 @@ def plot_portfolio_value(portfolio_value: list, section: str) -> None:
 
 def plot_trade_distribution(buy: int, sell: int, hold: int, section: str) -> None:
     """
-    Plot the distribution of buy and sell trades.
+    Plot the distribution of buy, sell, and hold trades.
 
     Parameters:
         buy (int): Number of buy trades.
@@ -47,6 +48,19 @@ def plot_trade_distribution(buy: int, sell: int, hold: int, section: str) -> Non
     plt.show()
 
 def make_overlay_histograms(train, test, val, feature_name):
+    """
+    Create overlay histograms for train, test, and validation sets.
+
+    Parameters:
+        train (pd.Series): Training data.
+        test (pd.Series): Testing data.
+        val (pd.Series): Validation data.
+        feature_name (str): Name of the feature to plot.
+
+    Returns:
+        fig (go.Figure): Plotly Figure object containing the overlay histograms.
+    """
+    
     fig = go.Figure()
     fig.add_trace(go.Histogram(
         x=train, name="Train", histnorm="probability density", opacity=0.6, marker_color="mediumslateblue"
@@ -69,6 +83,7 @@ def make_overlay_histograms(train, test, val, feature_name):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(l=10, r=10, t=40, b=10),
     )
+    
     return fig
 
 def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_threshold: float = 0.05):

@@ -17,6 +17,30 @@ def momentum_indicators(df: pd.DataFrame,
                         williams_r3_window: int = 21,
                         kama_pow1: int = 2,
                         kama_pow2: int = 30) -> pd.DataFrame:
+    """
+    Calculate momentum indicators and add them to the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame with price data.
+        rsi_window (int): Window size for RSI calculation.
+        rsi2_window (int): Window size for second RSI calculation.
+        rsi3_window (int): Window size for third RSI calculation.
+        kama_window (int): Window size for KAMA calculation.
+        stoch_window (int): Window size for Stochastic Oscillator calculation.
+        stoch2_window (int): Window size for second Stochastic Oscillator calculation.
+        stoch3_window (int): Window size for third Stochastic Oscillator calculation.
+        roc_window (int): Window size for ROC calculation.
+        roc2_window (int): Window size for second ROC calculation.
+        roc3_window (int): Window size for third ROC calculation.
+        williams_r_window (int): Window size for Williams %R calculation.
+        williams_r2_window (int): Window size for second Williams %R calculation.
+        williams_r3_window (int): Window size for third Williams %R calculation.
+        kama_pow1 (int): Power 1 for KAMA calculation.
+        kama_pow2 (int): Power 2 for KAMA calculation.
+
+    Returns:
+        pd.DataFrame: DataFrame with added momentum indicators.
+    """
 
     df = df.copy()
 
@@ -62,6 +86,18 @@ def volatility_indicators(df: pd.DataFrame,
                           bb_window: int = 20,
                           donchian_window: int = 20,
                           kc_window: int = 20) -> pd.DataFrame:
+    """
+    Calculate volatility indicators and add them to the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame with price data.
+        bb_window (int): Window size for Bollinger Bands calculation.
+        donchian_window (int): Window size for Donchian Channels calculation.
+        kc_window (int): Window size for Keltner Channels calculation.
+
+    Returns:
+        pd.DataFrame: DataFrame with added volatility indicators.
+    """
 
     df = df.copy()
 
@@ -90,6 +126,18 @@ def volume_indicators(df: pd.DataFrame,
                       mfi_window: int = 14,
                       eom_window: int = 14,
                       fi_window: int = 14) -> pd.DataFrame:
+    """
+    Calculate volume indicators and add them to the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame with price data.
+        mfi_window (int): Window size for Money Flow Index calculation.
+        eom_window (int): Window size for Ease of Movement calculation.
+        fi_window (int): Window size for Force Index calculation.
+
+    Returns:
+        pd.DataFrame: DataFrame with added volume indicators.
+    """
 
     df = df.copy()
 
@@ -118,6 +166,17 @@ def volume_indicators(df: pd.DataFrame,
     return df
 
 def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add all technical indicators to the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame with price data.
+
+    Returns:
+        pd.DataFrame: DataFrame with added technical indicators.
+    """
+
+    df = df.copy()
 
     df = momentum_indicators(df)
     df = volatility_indicators(df)
@@ -126,7 +185,17 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def get_signals(df: pd.DataFrame, alpha: float = 0.02) -> pd.DataFrame:
+    """
+    Generate trading signals based on future price movements.
 
+    Parameters:
+        df (pd.DataFrame): Input DataFrame with price data.
+        alpha (float): Threshold for generating buy/sell signals.
+    
+    Returns:
+        pd.DataFrame: DataFrame with added trading signals.
+    """
+    
     df = df.copy()
 
     # 5 day shifted column (future)

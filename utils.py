@@ -19,6 +19,7 @@ def get_data(ticker: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing historical market data.
     """ 
+
     data = yf.download(ticker, period="15y", interval="1d")
 
     if isinstance(data.columns, pd.MultiIndex):
@@ -63,9 +64,24 @@ def get_target(data:pd.DataFrame) -> pd.Series:
         
         y = data['final_signal']
         X = data.drop(columns=['final_signal', 'Open', 'High', 'Low', 'Volume'])
+
         return X, y
 
 def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash):
+    """
+    Show the results of the backtest.
+
+    Parameters:
+        data (pd.DataFrame): DataFrame containing market data and signals.
+        buy (int): Number of buy trades.
+        sell (int): Number of sell trades.
+        hold (int): Number of hold trades.
+        total_trades (int): Total number of trades.
+        win_rate (float): Win rate of the trades.
+        portfolio_value (list): List of portfolio values over time.
+        cash (float): Final cash amount.
+    """
+
     holds = hold
 
     print(f"Total buy signals: {buy}")
@@ -81,14 +97,35 @@ def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value,
     print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
 
 def load_model(model_name: str, model_version: str):
+    """
+    Load a TensorFlow model from MLflow.
+
+    Parameters:
+        model_name (str): Name of the model in MLflow.
+        model_version (str): Version of the model in MLflow.
+
+    Returns:
+        tf.keras.Model: Loaded TensorFlow model.
+    """
+
     model = mlflow.tensorflow.load_model(
         model_uri=f"models:/{model_name}/{model_version}"
     )
 
     print(model.summary())
+
     return model
 
 def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+    """
+    Run backtest per dataset (train/test/val) using the provided model.
+
+    Parameters:
+        datasets (dict): Dictionary containing datasets {name: (data, x_data)}.
+        model (tf.keras.Model): Trained TensorFlow model for predictions.
+        reference_features (pd.DataFrame, optional): Reference features for drift detection.
+    """
+
     for dataset_name, (data, x_data) in datasets.items():
         print(f"\n--- {dataset_name.upper()} ---")
         
@@ -116,7 +153,14 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
 def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
     """
     Run backtest and calculate data drift per dataset (train/test/val).
-    Returns the actual feature snapshots for plotting along with p-values.
+
+    Parameters:
+        datasets (dict): Dictionary containing datasets {name: (data, x_data)}.
+        model (tf.keras.Model): Trained TensorFlow model for predictions.
+        reference_features (pd.DataFrame, optional): Reference features for drift detection.
+
+    Returns:
+        tuple: (all_data_drift_results, all_p_values_results, portfolio_value)
     """
 
     all_data_drift_results = {}
@@ -167,6 +211,7 @@ def most_drifted_features(drift_results: dict, p_values: dict, top_n: int = 5, p
         if pvals_windows:
             windows_drifted = sum(1 for window in pvals_windows if window.get(feat, np.nan) < 0.05)
         results.append({"Feature": feat, "P-Value": avg_pval, "Windows Drifted": windows_drifted})
+
     return pd.DataFrame(results)
 
 def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
@@ -191,11 +236,20 @@ def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
         data["Feature"].append(feature)
         data["Drift Detected"].append(drifted)
         data["P-Value"].append(p_values.get(feature, np.nan))
+
     return pd.DataFrame(data)
 
 def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1):
     """
     Returns the indices of windows with most features drifted.
+
+    Parameters:
+        pvals_split (list): List of dictionaries with p-values per window.
+        threshold (float): P-value threshold for detecting drift.
+        top_fraction (float): Fraction of top windows to return.
+
+    Returns:
+        tuple: (drift_windows, drift_counts)
     """
     
     drift_counts = []

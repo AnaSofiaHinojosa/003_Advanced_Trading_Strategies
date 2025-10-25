@@ -29,6 +29,16 @@ with st.sidebar:
 # -------------------------------
 @st.cache_data(show_spinner=False)
 def build_datasets(ticker: str):
+    """
+    Build training, testing, and validation datasets for the specified ticker.
+
+    Parameters:
+        ticker (str): The stock ticker symbol.
+
+    Returns:
+        tuple: Train, test, and validation datasets, and their corresponding features.
+    """
+
     data = get_data(ticker)
     train, test, val = split_data(data)
 

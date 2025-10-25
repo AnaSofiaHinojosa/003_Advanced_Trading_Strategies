@@ -105,6 +105,7 @@ def evaluate_metrics(portfolio_values: pd.Series) -> pd.DataFrame:
         'Max drawdown': max_drawdown(portfolio_values),
         'Calmar ratio': calmar_ratio(portfolio_values)
     }
+    
     return pd.DataFrame([metrics], index=['Value'])
 
 def win_rate(win_rate_test, total_trades_test, win_rate_validation, total_trades_validation):
@@ -124,4 +125,5 @@ def win_rate(win_rate_test, total_trades_test, win_rate_validation, total_trades
     total_wins = (win_rate_test * total_trades_test) + (win_rate_validation * total_trades_validation)
     total_trades = total_trades_test + total_trades_validation
     total_win_rate = total_wins / total_trades if total_trades > 0 else 0
+
     return total_win_rate

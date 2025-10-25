@@ -2,6 +2,20 @@ from models import Operation
 from datadrift import calculate_drift_metrics, calculate_drift_pvalues
 
 def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int) -> float:
+    """
+    Calculate the total portfolio value including cash and open positions.
+
+    Parameters:
+        cash (float): Current cash available.
+        long_ops (list[Operation]): List of active long positions.
+        short_ops (list[Operation]): List of active short positions.
+        current_price (float): Current price of the asset.
+        n_shares (int): Number of shares per operation.
+    
+    Returns:
+        float: Total portfolio value.
+    """
+    
     val = cash
 
     # Add long positions value
@@ -17,6 +31,18 @@ def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[
     return val
 
 def backtest(data, reference_features=None, compare_features=None):
+    """
+    Backtest trading strategy based on generated signals.
+    
+    Parameters:
+        data (DataFrame): DataFrame containing historical price data and signals.
+        reference_features (DataFrame, optional): Reference features for drift detection.
+        compare_features (DataFrame, optional): Features to compare for drift detection.
+
+    Returns:
+        tuple: Final cash, portfolio value over time, win rate, buy count, sell count, hold count, total trades,
+               data drift results, p-values results, dashboard snapshot.
+    """
 
     # Trade params
     stop_loss = 0.07

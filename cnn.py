@@ -6,7 +6,15 @@ import mlflow
 def build_cnn_model(input_shape, params):
     """
     Build a Convolutional Neural Network (CNN) model with hyperparameters.
+
+    Parameters:
+        input_shape (int): Shape of the input data.
+        params (dict): Dictionary containing hyperparameters for the model.
+
+    Returns:
+        tf.keras.Model: Compiled CNN model.
     """
+
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape, 1)))
 
@@ -32,6 +40,7 @@ def build_cnn_model(input_shape, params):
     model.compile(optimizer=optimizer,
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
+    
     return model
 
 # Function 2: Train and log with MLflow
@@ -39,7 +48,17 @@ def build_cnn_model(input_shape, params):
 def train_and_log_cnn(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32):
     """
     Train multiple CNN configurations and log results to MLflow.
+
+    Parameters:
+        x_train (np.array): Training features.
+        y_train (np.array): Training labels.
+        x_test (np.array): Testing features.
+        y_test (np.array): Testing labels.
+        params_space (list): List of hyperparameter dictionaries to try.
+        epochs (int): Number of training epochs.
+        batch_size (int): Size of training batches.
     """
+
     print("Training models...")
 
     # Shift labels from -1,0,1 → 0,1,2 for compatibility

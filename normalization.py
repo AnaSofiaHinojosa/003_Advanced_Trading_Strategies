@@ -2,6 +2,16 @@ import pandas as pd
 from typing import Dict, Tuple
 
 def normalize_indicators(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
+    """
+    Normalize technical indicators in the dataframe.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing technical indicators.
+
+    Returns:
+        tuple: Normalized DataFrame and parameters used for normalization.
+    """
+
     df = df.copy()
 
     params = {}
@@ -55,9 +65,21 @@ def normalize_indicators(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     df = df.drop(columns=['bb_upper', 'bb_lower',
                           'kc_upper', 'kc_lower',
                           'donchian_high', 'donchian_low'])
+    
     return df, params
 
 def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
+    """
+    Normalize new data using provided parameters.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing new data to normalize.
+        params (dict): Dictionary containing normalization parameters.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame.
+    """
+    
     df = df.copy()
 
     # --- RSI (0 to 100) → 0 to 1---
@@ -105,6 +127,16 @@ def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     return df
 
 def normalize_indicators_price(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
+    """
+    Normalize technical indicators in the dataframe including price.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing technical indicators.
+
+    Returns:
+        tuple: Normalized DataFrame and parameters used for normalization.
+    """
+
     df = df.copy()
 
     params = {}
@@ -163,9 +195,21 @@ def normalize_indicators_price(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     df = df.drop(columns=['bb_upper', 'bb_lower',
                           'kc_upper', 'kc_lower',
                           'donchian_high', 'donchian_low'])
+    
     return df, params
 
 def normalize_new_data_price(df: pd.DataFrame, params: dict) -> pd.DataFrame:
+    """
+    Normalize new data using provided parameters and including price.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing new data to normalize.
+        params (dict): Dictionary containing normalization parameters.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame.
+    """
+    
     df = df.copy()
 
     # --- RSI (0 to 100) → 0 to 1---
