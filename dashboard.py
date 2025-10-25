@@ -116,6 +116,29 @@ if run_btn:
                 )
                 col.plotly_chart(pval_fig, use_container_width=True)
 
+                        # -------------------------------
+        # Statistics tables for Test and Val
+        # -------------------------------
+        st.subheader("Statistics Table: Periods and Features with Detected Drift")
+
+        avg_pvals_test = {feat: np.nanmean([win.get(feat, np.nan) for win in pvals_test]) for feat in common_features}
+        avg_pvals_val = {feat: np.nanmean([win.get(feat, np.nan) for win in pvals_val]) for feat in common_features}
+
+        drift_flags_test = {feat: (pval < 0.05) for feat, pval in avg_pvals_test.items()}
+        drift_flags_val = {feat: (pval < 0.05) for feat, pval in avg_pvals_val.items()}
+
+        df_stats_test = statistics_table(drift_flags_test, avg_pvals_test)
+        df_stats_val = statistics_table(drift_flags_val, avg_pvals_val)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("#### Test Set")
+            st.dataframe(df_stats_test.style.format({"P-Value": "{:.4f}"}))
+        with col2:
+            st.markdown("#### Validation Set")
+            st.dataframe(df_stats_val.style.format({"P-Value": "{:.4f}"}))
+            
+
     st.success("Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
 else:
     st.info("Set your ticker on the left and click **Run Drift Analysis** to begin.")
