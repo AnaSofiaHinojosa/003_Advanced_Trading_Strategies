@@ -12,3 +12,4 @@ streamlit
 ta
 tensorflow
 yfinance
+plotly
