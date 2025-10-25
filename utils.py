@@ -99,7 +99,7 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
         # --- Backtest the strategy with optional drift check ---
-        cash, portfolio_value, win_rate, buy, sell, hold, total_trades = backtest(data, 
+        cash, portfolio_value, win_rate, buy, sell, hold, total_trades, data_drift_results, p_values_results, _ = backtest(data,
                                                                             reference_features=reference_features, 
                                                                             compare_features=x_data)
 
@@ -111,3 +111,106 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
 
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value, section=dataset_name)
+
+        # --- Display drift result ---
+        print(f"Drift detection results for {dataset_name} dataset:")
+        for i, (drift_metrics, p_values) in enumerate(zip(data_drift_results, p_values_results)):
+            print(f" Window {i+1}:")
+            for feature, drifted in drift_metrics.items():
+                p_value = p_values[feature]
+                status = "Drift detected" if drifted else "No drift"
+                if status == "Drift detected":
+                    print(f"  Feature: {feature}, {status} (p-value: {p_value:.4f})")
+
+
+def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+    """
+    Run backtest and calculate data drift per dataset (train/test/val).
+    Returns the actual feature snapshots for plotting along with p-values.
+    """
+    all_data_drift_results = {}
+    all_p_values_results = {}
+
+    for dataset_name, (data, x_data) in datasets.items():
+        # --- Predict ---
+        y_pred = model.predict(x_data)
+        y_pred_classes = np.argmax(y_pred, axis=1)
+        data = data.copy()
+        data['final_signal'] = y_pred_classes - 1
+
+        # --- Backtest + drift ---
+        (cash, portfolio_value, win_rate, buy, sell, hold, total_trades,
+         data_drift_results, p_values_results, dashboard_snapshot) = backtest(
+            data,
+            reference_features=reference_features,
+            compare_features=x_data
+        )
+
+        # Store snapshots per dataset
+        all_data_drift_results[dataset_name] = dashboard_snapshot
+        all_p_values_results[dataset_name] = p_values_results
+
+    return all_data_drift_results, all_p_values_results, portfolio_value
+
+def most_drifted_features(drift_results: dict, p_values: dict, top_n: int = 5, pvals_windows: list = None) -> pd.DataFrame:
+    """
+    Identify the top N most drifted features based on p-values and optionally show number of windows drifted.
+
+    Parameters:
+        drift_results (dict): Dictionary of drift results {feature_name: True/False}.
+        p_values (dict): Dictionary of average p-values {feature_name: avg_p_value}.
+        top_n (int): Number of top drifted features to return.
+        pvals_windows (list): List of dicts with p-values per window.
+
+    Returns:
+        pd.DataFrame: DataFrame with top N drifted features, avg p-value, and windows drifted.
+    """
+    drifted_features = {feat: pval for feat, pval in p_values.items() if drift_results.get(feat, False)}
+    sorted_features = sorted(drifted_features.items(), key=lambda item: item[1])
+    top_drifted = sorted_features[:top_n]
+
+    results = []
+    for feat, avg_pval in top_drifted:
+        windows_drifted = 0
+        if pvals_windows:
+            windows_drifted = sum(1 for window in pvals_windows if window.get(feat, np.nan) < 0.05)
+        results.append({"Feature": feat, "P-Value": avg_pval, "Windows Drifted": windows_drifted})
+    return pd.DataFrame(results)
+
+def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
+    """
+    Create a statistics table summarizing drift results.
+
+    Parameters:
+        drift_flags (dict): Dictionary with feature names as keys and drift status (True/False) as values.
+        p_values (dict): Dictionary with feature names as keys and p-values as values.
+
+    Returns:
+        pd.DataFrame: DataFrame summarizing drift results.
+    """
+    data = {
+        "Feature": [],
+        "Drift Detected": [],
+        "P-Value": []
+    }
+    for feature, drifted in drift_flags.items():
+        data["Feature"].append(feature)
+        data["Drift Detected"].append(drifted)
+        data["P-Value"].append(p_values.get(feature, np.nan))
+    return pd.DataFrame(data)
+
+def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1):
+    """
+    Returns the indices of windows with most features drifted.
+    """
+    drift_counts = []
+    for window in pvals_split:
+        drift_count = sum(1 for p in window.values() if p < threshold)
+        drift_counts.append(drift_count)
+    drift_counts = np.array(drift_counts)
+    
+    # Mark windows above top_fraction percentile
+    cutoff = np.percentile(drift_counts, 100*(1-top_fraction))
+    drift_windows = np.where(drift_counts >= cutoff)[0]
+    
+    return drift_windows, drift_counts
