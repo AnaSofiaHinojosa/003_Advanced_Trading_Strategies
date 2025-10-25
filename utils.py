@@ -99,7 +99,7 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
         # --- Backtest the strategy with optional drift check ---
-        cash, portfolio_value, win_rate, buy, sell, hold, total_trades = backtest(data, 
+        cash, portfolio_value, win_rate, buy, sell, hold, total_trades, data_drift_results, p_values_results, _ = backtest(data,
                                                                             reference_features=reference_features, 
                                                                             compare_features=x_data)
 
@@ -111,6 +111,7 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
 
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value, section=dataset_name)
+
 
 def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
     """
@@ -187,3 +188,19 @@ def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
         data["Drift Detected"].append(drifted)
         data["P-Value"].append(p_values.get(feature, np.nan))
     return pd.DataFrame(data)
+
+def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1):
+    """
+    Returns the indices of windows with most features drifted.
+    """
+    drift_counts = []
+    for window in pvals_split:
+        drift_count = sum(1 for p in window.values() if p < threshold)
+        drift_counts.append(drift_count)
+    drift_counts = np.array(drift_counts)
+    
+    # Mark windows above top_fraction percentile
+    cutoff = np.percentile(drift_counts, 100*(1-top_fraction))
+    drift_windows = np.where(drift_counts >= cutoff)[0]
+    
+    return drift_windows, drift_counts
