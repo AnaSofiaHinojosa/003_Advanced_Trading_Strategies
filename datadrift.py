@@ -29,3 +29,16 @@ def calculate_drift_metrics(reference_df: pd.DataFrame, new_df: pd.DataFrame, al
         drift_detected = ks_drift(reference_df[column], new_df[column], alpha)
         drift_results[column] = drift_detected
     return drift_results
+
+def calculate_drift_pvalues(reference_df: pd.DataFrame, new_df: pd.DataFrame) -> dict:
+    """
+    Calculate p-values for each feature in the datasets.
+
+    Returns a dict: {feature_name: p_value}.
+    """
+    p_values = {}
+    for column in reference_df.columns:
+        _, p_value = ks_2samp(reference_df[column], new_df[column])
+        p_values[column] = p_value
+
+    return p_values
