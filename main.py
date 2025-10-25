@@ -2,7 +2,6 @@ from utils import get_data, split_data, get_target, load_model, run_nn
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data, normalize_indicators_price, normalize_new_data_price
 
-
 def main():
     # --- Load data ---
     data = get_data("HP")
@@ -24,7 +23,6 @@ def main():
     x_train_norm, y_train_norm = get_target(data_train_norm)
     
     # --- Normalize new data ---
-
     data_test = add_all_indicators(data_test)
     data_test = get_signals(data_test)
     data_test_bt = normalize_new_data(data_test, params)
@@ -49,7 +47,6 @@ def main():
         "val": (data_val_bt, x_val_norm)
     }
     
-
     # --- MLP ---
     model_name_mlp = 'MLPtrading'
     model_version_mlp = 'latest'

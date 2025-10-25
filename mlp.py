@@ -1,8 +1,6 @@
 import tensorflow as tf
 import mlflow
 
-
-
 # Function 1: Build MLP model
 
 def build_mlp_model(input_shape, params):
@@ -62,5 +60,3 @@ def train_and_log_mlp(x_train, y_train, x_test, y_test, params_space, epochs=2, 
                 "val_accuracy": hist.history['val_accuracy'][-1],
                 "val_loss": hist.history['val_loss'][-1],
             }
-            # print(f"Final metrics: {final_metrics}")
-        

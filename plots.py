@@ -83,6 +83,7 @@ def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_thre
     Returns:
         fig_test (go.Figure), fig_val (go.Figure)
     """
+
     # Count drifted features per window
     drift_counts_test = [sum(1 for p in window.values() if p < drift_threshold) for window in pvals_test]
     drift_counts_val = [sum(1 for p in window.values() if p < drift_threshold) for window in pvals_val]

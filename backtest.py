@@ -102,6 +102,7 @@ def backtest(data, reference_features=None, compare_features=None):
             if cash > position_value:
                 # Discount the cost
                 cash -= position_value
+                # Count the buy
                 buy += 1
                 # Save the operation as active position
                 active_long_positions.append(
@@ -124,6 +125,7 @@ def backtest(data, reference_features=None, compare_features=None):
             if cash > short_cost:
                 # Discount the cost
                 cash -= short_cost
+                # Count the sell
                 sell += 1
                 # Save the operation as active position
                 active_short_positions.append(
@@ -137,6 +139,7 @@ def backtest(data, reference_features=None, compare_features=None):
                     )
                 )
         else:
+            # Count the hold
             hold += 1        
                 
         portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))

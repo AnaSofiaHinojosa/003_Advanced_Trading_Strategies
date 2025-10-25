@@ -3,7 +3,6 @@ import mlflow
 
 # Function 1: Build CNN model
 
-
 def build_cnn_model(input_shape, params):
     """
     Build a Convolutional Neural Network (CNN) model with hyperparameters.
@@ -36,7 +35,6 @@ def build_cnn_model(input_shape, params):
     return model
 
 # Function 2: Train and log with MLflow
-
 
 def train_and_log_cnn(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32):
     """
@@ -71,4 +69,3 @@ def train_and_log_cnn(x_train, y_train, x_test, y_test, params_space, epochs=2, 
                 "val_accuracy": hist.history['val_accuracy'][-1],
                 "val_loss": hist.history['val_loss'][-1],
             }
-            # print(f"Final metrics: {final_metrics}")

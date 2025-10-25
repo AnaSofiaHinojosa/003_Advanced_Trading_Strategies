@@ -28,7 +28,6 @@ def get_data(ticker: str) -> pd.DataFrame:
 
     return data
 
-
 def split_data(data: pd.DataFrame):
     """
     Split the data into training, testing, and validation sets.
@@ -68,6 +67,7 @@ def get_target(data:pd.DataFrame) -> pd.Series:
 
 def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash):
     holds = hold
+
     print(f"Total buy signals: {buy}")
     print(f"Total sell signals: {sell}")
     print(f"Total trades: {total_trades}")
@@ -84,6 +84,7 @@ def load_model(model_name: str, model_version: str):
     model = mlflow.tensorflow.load_model(
         model_uri=f"models:/{model_name}/{model_version}"
     )
+
     print(model.summary())
     return model
 
@@ -112,12 +113,12 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value, section=dataset_name)
 
-
 def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
     """
     Run backtest and calculate data drift per dataset (train/test/val).
     Returns the actual feature snapshots for plotting along with p-values.
     """
+
     all_data_drift_results = {}
     all_p_values_results = {}
 
@@ -155,6 +156,7 @@ def most_drifted_features(drift_results: dict, p_values: dict, top_n: int = 5, p
     Returns:
         pd.DataFrame: DataFrame with top N drifted features, avg p-value, and windows drifted.
     """
+
     drifted_features = {feat: pval for feat, pval in p_values.items() if drift_results.get(feat, False)}
     sorted_features = sorted(drifted_features.items(), key=lambda item: item[1])
     top_drifted = sorted_features[:top_n]
@@ -178,11 +180,13 @@ def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame summarizing drift results.
     """
+
     data = {
         "Feature": [],
         "Drift Detected": [],
         "P-Value": []
     }
+
     for feature, drifted in drift_flags.items():
         data["Feature"].append(feature)
         data["Drift Detected"].append(drifted)
@@ -193,6 +197,7 @@ def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1):
     """
     Returns the indices of windows with most features drifted.
     """
+    
     drift_counts = []
     for window in pvals_split:
         drift_count = sum(1 for p in window.values() if p < threshold)

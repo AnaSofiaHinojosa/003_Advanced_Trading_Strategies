@@ -32,15 +32,18 @@ def build_datasets(ticker: str):
     data = get_data(ticker)
     train, test, val = split_data(data)
 
+    # train
     train = add_all_indicators(train)
     train = get_signals(train)
     train, params = normalize_indicators(train)
     train = train.dropna()
 
+    # test
     test = add_all_indicators(test)
     test = get_signals(test)
     test = normalize_new_data(test, params).dropna()
 
+    # val
     val = add_all_indicators(val)
     val = get_signals(val)
     val = normalize_new_data(val, params).dropna()

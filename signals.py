@@ -1,7 +1,6 @@
 import ta
 import pandas as pd
 
-
 def momentum_indicators(df: pd.DataFrame,
                         rsi_window: int = 14,
                         rsi2_window: int = 10,
@@ -22,6 +21,7 @@ def momentum_indicators(df: pd.DataFrame,
     df = df.copy()
 
     # --- Momentum indicators ---
+
     # RSI
     df['rsi'] = ta.momentum.RSIIndicator(df['Close'], window=rsi_window).rsi()
     df['rsi2'] = ta.momentum.RSIIndicator(
@@ -58,7 +58,6 @@ def momentum_indicators(df: pd.DataFrame,
 
     return df
 
-
 def volatility_indicators(df: pd.DataFrame,
                           bb_window: int = 20,
                           donchian_window: int = 20,
@@ -87,11 +86,13 @@ def volatility_indicators(df: pd.DataFrame,
 
     return df
 
-
 def volume_indicators(df: pd.DataFrame,
                       mfi_window: int = 14,
                       eom_window: int = 14,
                       fi_window: int = 14) -> pd.DataFrame:
+
+    df = df.copy()
+
     # --- Volume indicators ---
 
     # OBV
@@ -116,7 +117,6 @@ def volume_indicators(df: pd.DataFrame,
 
     return df
 
-
 def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     df = momentum_indicators(df)
@@ -129,9 +129,16 @@ def get_signals(df: pd.DataFrame, alpha: float = 0.02) -> pd.DataFrame:
 
     df = df.copy()
 
+    # 5 day shifted column (future)
     df['future_price'] = df['Close'].shift(-5)
+
+    # Initialize all signals to 0
     df['final_signal'] = 0
+
+    # Buy signals
     df.loc[df[df.columns[0]] * (1+alpha) < df['future_price'], 'final_signal'] = 1
+
+    # Sell signals
     df.loc[df[df.columns[0]] * (1-alpha) > df['future_price'], 'final_signal'] = -1
 
     df.drop(columns=['future_price'], inplace=True)

@@ -12,7 +12,7 @@ def sharpe_ratio(portfolio_values: pd.Series) -> float:
         float: Sharpe ratio of the portfolio.
     """
     
-    # Hourly
+    # Daily
     returns = portfolio_values.pct_change().dropna()
     mean = returns.mean()
     std = returns.std()
@@ -35,7 +35,7 @@ def sortino_ratio(portfolio_values: pd.Series) -> float:
         float: Sortino ratio of the portfolio.
     """
 
-    # Hourly
+    # Daily
     returns = portfolio_values.pct_change().dropna()
     mean = returns.mean()
     downside = np.minimum(returns, 0).std()
@@ -75,7 +75,7 @@ def calmar_ratio(portfolio_values: pd.Series) -> float:
         float: Calmar ratio of the portfolio.
     """
     
-    # Hourly
+    # Daily
     returns = portfolio_values.pct_change().dropna()
     mean = returns.mean()
 

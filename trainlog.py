@@ -7,7 +7,6 @@ from cnn import train_and_log_cnn
 import mlflow
 import mlflow.tensorflow
 
-
 def trainlog():
     mlflow.tensorflow.autolog()
 
@@ -31,7 +30,6 @@ def trainlog():
     x_train_norm, y_train_norm = get_target(data_train_norm)
 
     # --- Normalize new data ---
-
     data_test = add_all_indicators(data_test)
     data_test = get_signals(data_test)
     data_test_bt = normalize_new_data(data_test, params)

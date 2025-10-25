@@ -214,3 +214,4 @@ def normalize_new_data_price(df: pd.DataFrame, params: dict) -> pd.DataFrame:
                         'donchian_high', 'donchian_low'])
 
     return df
+    
