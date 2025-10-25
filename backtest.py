@@ -1,5 +1,5 @@
 from models import Operation
-from datadrift import calculate_drift_metrics
+from datadrift import calculate_drift_metrics, calculate_drift_pvalues
 
 def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price:float, n_shares: int) -> float:
     val = cash
@@ -51,6 +51,13 @@ def backtest(data, reference_features=None, compare_features=None):
     buy = 0
     sell = 0
     hold = 0
+
+    # Drift detection params
+    window_size = 90
+    window_step = 30
+
+    data_drift_results: list[dict] = []
+    p_values_results: list[dict] = []  
 
     for i, row in enumerate(historic.itertuples(index=True)):
         # Close positions
@@ -134,6 +141,33 @@ def backtest(data, reference_features=None, compare_features=None):
                 
         portfolio_value.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
 
+        j = i + 1
+        # Drift detection
+        if reference_features is not None and compare_features is not None:
+            if j >= window_size and (j - window_size) % window_step == 0:
+                start_window = j - window_size
+                end_window = j
+
+                # Add dataframe with established window
+                df_with_window = compare_features.iloc[start_window:end_window]
+
+                # Calculate drift metrics
+                drift_metrics = calculate_drift_metrics(reference_features, df_with_window)
+
+                # Calculate p-values
+                p_values = calculate_drift_pvalues(reference_features, df_with_window)
+
+                feature_snapshot = {
+                    "train": reference_features.to_dict(orient="records"),
+                    "test":  compare_features.to_dict(orient="records"),
+                    "val":   df_with_window.to_dict(orient="records")
+                }
+                
+                # Store results
+                data_drift_results.append(drift_metrics)
+                p_values_results.append(p_values)
+                dashboard_snapshot = feature_snapshot
+
     # Close long positions        
     for position in active_long_positions:
         pnl = (row.Close - position.price) * position.n_shares * (1 - COM)
@@ -161,4 +195,4 @@ def backtest(data, reference_features=None, compare_features=None):
     win_rate = positive_trades / (positive_trades + negative_trades) if (positive_trades + negative_trades) > 0 else 0
     total_trades = positive_trades + negative_trades
 
-    return cash, portfolio_value, win_rate, buy, sell, hold, total_trades
+    return cash, portfolio_value, win_rate, buy, sell, hold, total_trades, data_drift_results, p_values_results, dashboard_snapshot
