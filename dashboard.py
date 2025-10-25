@@ -148,8 +148,33 @@ if run_btn:
         with col1:
             st.plotly_chart(fig_test, use_container_width=True)
         with col2:
-            st.plotly_chart(fig_val, use_container_width=True)    
+            st.plotly_chart(fig_val, use_container_width=True)
 
+        # -------------------------------
+        # Show top 5 drifted features
+        # -------------------------------
+        st.subheader("Summary: Top 5 Most Drifted Features")
+        top_drifted_test = most_drifted_features(
+            drift_flags_test,
+            avg_pvals_test,
+            top_n=5,
+            pvals_windows=pvals_test
+        )
+        top_drifted_val = most_drifted_features(
+            drift_flags_val,
+            avg_pvals_val,
+            top_n=5,
+            pvals_windows=pvals_val
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("#### Test Set")
+            st.dataframe(top_drifted_test.style.format({"P-Value": "{:.4f}"}))
+        with col2:
+            st.markdown("#### Validation Set")
+            st.dataframe(top_drifted_val.style.format({"P-Value": "{:.4f}"}))
+    
     st.success("Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
 else:
     st.info("Set your ticker on the left and click **Run Drift Analysis** to begin.")
