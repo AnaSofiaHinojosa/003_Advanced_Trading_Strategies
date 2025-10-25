@@ -29,31 +29,18 @@ with st.sidebar:
 # -------------------------------
 @st.cache_data(show_spinner=False)
 def build_datasets(ticker: str):
-    """
-    Build training, testing, and validation datasets for the specified ticker.
-
-    Parameters:
-        ticker (str): The stock ticker symbol.
-
-    Returns:
-        tuple: Train, test, and validation datasets, and their corresponding features.
-    """
-
     data = get_data(ticker)
     train, test, val = split_data(data)
 
-    # train
     train = add_all_indicators(train)
     train = get_signals(train)
     train, params = normalize_indicators(train)
     train = train.dropna()
 
-    # test
     test = add_all_indicators(test)
     test = get_signals(test)
     test = normalize_new_data(test, params).dropna()
 
-    # val
     val = add_all_indicators(val)
     val = get_signals(val)
     val = normalize_new_data(val, params).dropna()
@@ -152,7 +139,7 @@ if run_btn:
             st.dataframe(df_stats_val.style.format({"P-Value": "{:.4f}"}))
 
         # -------------------------------
-        # Show drifted windows plot
+        # Show drifted windows on portfolio value plot
         # -------------------------------
         st.subheader("Highlighted Drifted Windows")
 
@@ -188,6 +175,7 @@ if run_btn:
             st.markdown("#### Validation Set")
             st.dataframe(top_drifted_val.style.format({"P-Value": "{:.4f}"}))
     
+
     st.success("Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
 else:
     st.info("Set your ticker on the left and click **Run Drift Analysis** to begin.")

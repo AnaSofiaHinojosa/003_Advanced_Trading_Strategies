@@ -8,7 +8,6 @@ def plot_portfolio_value(portfolio_value: list, section: str) -> None:
 
     Parameters:
         portfolio_value (list): List of portfolio values over time.
-        section (str): Section name (train, test, val).
     """
 
     colors = {'train': 'steelblue', 'test': 'palevioletred', 'val': 'indianred'}
@@ -25,7 +24,7 @@ def plot_portfolio_value(portfolio_value: list, section: str) -> None:
 
 def plot_trade_distribution(buy: int, sell: int, hold: int, section: str) -> None:
     """
-    Plot the distribution of buy, sell, and hold trades.
+    Plot the distribution of buy and sell trades.
 
     Parameters:
         buy (int): Number of buy trades.
@@ -48,19 +47,6 @@ def plot_trade_distribution(buy: int, sell: int, hold: int, section: str) -> Non
     plt.show()
 
 def make_overlay_histograms(train, test, val, feature_name):
-    """
-    Create overlay histograms for train, test, and validation sets.
-
-    Parameters:
-        train (pd.Series): Training data.
-        test (pd.Series): Testing data.
-        val (pd.Series): Validation data.
-        feature_name (str): Name of the feature to plot.
-
-    Returns:
-        fig (go.Figure): Plotly Figure object containing the overlay histograms.
-    """
-    
     fig = go.Figure()
     fig.add_trace(go.Histogram(
         x=train, name="Train", histnorm="probability density", opacity=0.6, marker_color="mediumslateblue"
@@ -83,7 +69,6 @@ def make_overlay_histograms(train, test, val, feature_name):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(l=10, r=10, t=40, b=10),
     )
-    
     return fig
 
 def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_threshold: float = 0.05):
@@ -98,13 +83,26 @@ def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_thre
     Returns:
         fig_test (go.Figure), fig_val (go.Figure)
     """
-
     # Count drifted features per window
     drift_counts_test = [sum(1 for p in window.values() if p < drift_threshold) for window in pvals_test]
     drift_counts_val = [sum(1 for p in window.values() if p < drift_threshold) for window in pvals_val]
 
     x_test = list(range(len(drift_counts_test)))
     x_val = list(range(len(drift_counts_val)))
+
+    def create_background_shapes(max_y):
+        """Create colored background bands."""
+        return [
+            # Green zone
+            dict(type="rect", xref="paper", x0=0, x1=1, yref="y", y0=0, y1=12,
+                 fillcolor="rgba(0, 255, 0, 0.1)", line=dict(width=0)),
+            # Yellow zone
+            dict(type="rect", xref="paper", x0=0, x1=1, yref="y", y0=12, y1=20,
+                 fillcolor="rgba(255, 255, 0, 0.15)", line=dict(width=0)),
+            # Red zone
+            dict(type="rect", xref="paper", x0=0, x1=1, yref="y", y0=20, y1=max_y,
+                 fillcolor="rgba(255, 0, 0, 0.1)", line=dict(width=0))
+        ]
 
     # ------------------ Test plot ------------------
     fig_test = go.Figure()
@@ -119,7 +117,8 @@ def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_thre
         title=dict(text="Test Set: Drifted Features per Window", x=0.5, xanchor="center"),
         xaxis_title="Window Index",
         yaxis_title="Number of Drifted Features",
-        margin=dict(l=10, r=10, t=50, b=10)
+        margin=dict(l=10, r=10, t=50, b=10),
+        shapes=create_background_shapes(max_y=max(drift_counts_test + [22]))
     )
 
     # ------------------ Validation plot ------------------
@@ -135,7 +134,8 @@ def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_thre
         title=dict(text="Validation Set: Drifted Features per Window", x=0.5, xanchor="center"),
         xaxis_title="Window Index",
         yaxis_title="Number of Drifted Features",
-        margin=dict(l=10, r=10, t=50, b=10)
+        margin=dict(l=10, r=10, t=50, b=10),
+        shapes=create_background_shapes(max_y=max(drift_counts_val + [22]))
     )
 
     return fig_test, fig_val
