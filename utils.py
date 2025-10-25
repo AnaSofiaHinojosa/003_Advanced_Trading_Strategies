@@ -137,7 +137,7 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         data['final_signal'] = y_pred_classes - 1  # Shift back to -1,0,1
 
         # --- Backtest the strategy with optional drift check ---
-        cash, portfolio_value, win_rate, buy, sell, hold, total_trades, data_drift_results, p_values_results, _ = backtest(data,
+        cash, portfolio_value, win_rate, buy, sell, hold, total_trades, _, _ = backtest(data,
                                                                             reference_features=reference_features, 
                                                                             compare_features=x_data)
 

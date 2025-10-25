@@ -224,4 +224,4 @@ def backtest(data, reference_features=None, compare_features=None):
     win_rate = positive_trades / (positive_trades + negative_trades) if (positive_trades + negative_trades) > 0 else 0
     total_trades = positive_trades + negative_trades
 
-    return cash, portfolio_value, win_rate, buy, sell, hold, total_trades, data_drift_results, p_values_results, dashboard_snapshot
+    return cash, portfolio_value, win_rate, buy, sell, hold, total_trades, data_drift_results, p_values_results

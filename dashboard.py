@@ -29,18 +29,31 @@ with st.sidebar:
 # -------------------------------
 @st.cache_data(show_spinner=False)
 def build_datasets(ticker: str):
+    """
+    Build training, testing, and validation datasets for the specified ticker.
+
+    Parameters:
+        ticker (str): The stock ticker symbol.
+
+    Returns:
+        tuple: Train, test, and validation datasets, and their corresponding features.
+    """
+
     data = get_data(ticker)
     train, test, val = split_data(data)
 
+    # train
     train = add_all_indicators(train)
     train = get_signals(train)
     train, params = normalize_indicators(train)
     train = train.dropna()
 
+    # test
     test = add_all_indicators(test)
     test = get_signals(test)
     test = normalize_new_data(test, params).dropna()
 
+    # val
     val = add_all_indicators(val)
     val = get_signals(val)
     val = normalize_new_data(val, params).dropna()
@@ -59,8 +72,8 @@ if run_btn:
         train, test, val, x_train, x_test, x_val = build_datasets(ticker)
 
         # Run backtest for Test and Val
-        _, _, _, _, _, _, _, _, pvals_test, _ = backtest(test, reference_features=x_train, compare_features=x_test)
-        _, _, _, _, _, _, _, _, pvals_val, _ = backtest(val, reference_features=x_train, compare_features=x_val)
+        _, _, _, _, _, _, _, _, pvals_test = backtest(test, reference_features=x_train, compare_features=x_test)
+        _, _, _, _, _, _, _, _, pvals_val = backtest(val, reference_features=x_train, compare_features=x_val)
 
         common_features = sorted(set(x_train.columns) & set(x_test.columns) & set(x_val.columns))
 
@@ -139,7 +152,7 @@ if run_btn:
             st.dataframe(df_stats_val.style.format({"P-Value": "{:.4f}"}))
 
         # -------------------------------
-        # Show drifted windows on portfolio value plot
+        # Show drifted windows plot
         # -------------------------------
         st.subheader("Highlighted Drifted Windows")
 
@@ -175,7 +188,6 @@ if run_btn:
             st.markdown("#### Validation Set")
             st.dataframe(top_drifted_val.style.format({"P-Value": "{:.4f}"}))
     
-
     st.success("Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
 else:
     st.info("Set your ticker on the left and click **Run Drift Analysis** to begin.")
