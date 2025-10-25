@@ -116,7 +116,7 @@ if run_btn:
                 )
                 col.plotly_chart(pval_fig, use_container_width=True)
 
-                        # -------------------------------
+        # -------------------------------
         # Statistics tables for Test and Val
         # -------------------------------
         st.subheader("Statistics Table: Periods and Features with Detected Drift")
@@ -137,7 +137,18 @@ if run_btn:
         with col2:
             st.markdown("#### Validation Set")
             st.dataframe(df_stats_val.style.format({"P-Value": "{:.4f}"}))
-            
+
+        # -------------------------------
+        # Show drifted windows plot
+        # -------------------------------
+        st.subheader("Highlighted Drifted Windows")
+
+        fig_test, fig_val = plot_drifted_features_timeline(pvals_test, pvals_val)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.plotly_chart(fig_test, use_container_width=True)
+        with col2:
+            st.plotly_chart(fig_val, use_container_width=True)    
 
     st.success("Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
 else:
