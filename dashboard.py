@@ -154,8 +154,18 @@ if run_btn:
         # Show top 5 drifted features
         # -------------------------------
         st.subheader("Summary: Top 5 Most Drifted Features")
-        top_drifted_test = most_drifted_features(drift_flags_test, avg_pvals_test, top_n=5)
-        top_drifted_val = most_drifted_features(drift_flags_val, avg_pvals_val, top_n=5)
+        top_drifted_test = most_drifted_features(
+            drift_flags_test,
+            avg_pvals_test,
+            top_n=5,
+            pvals_windows=pvals_test
+        )
+        top_drifted_val = most_drifted_features(
+            drift_flags_val,
+            avg_pvals_val,
+            top_n=5,
+            pvals_windows=pvals_val
+        )
 
         col1, col2 = st.columns(2)
         with col1:

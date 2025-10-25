@@ -112,16 +112,6 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         # --- Plot portfolio value ---
         plot_portfolio_value(portfolio_value, section=dataset_name)
 
-        # --- Display drift result ---
-        print(f"Drift detection results for {dataset_name} dataset:")
-        for i, (drift_metrics, p_values) in enumerate(zip(data_drift_results, p_values_results)):
-            print(f" Window {i+1}:")
-            for feature, drifted in drift_metrics.items():
-                p_value = p_values[feature]
-                status = "Drift detected" if drifted else "No drift"
-                if status == "Drift detected":
-                    print(f"  Feature: {feature}, {status} (p-value: {p_value:.4f})")
-
 
 def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
     """
