@@ -1,0 +1,10 @@
+artifact_location: file:///Users/sofia/Desktop/se%CC%81ptimo/003_Advanced_Trading_Strategies/mlruns/292442929960344488/models/m-af4d9595f2cb4ea7b9cf677be84e3ab6/artifacts
+creation_timestamp: 1761438735287
+experiment_id: '292442929960344488'
+last_updated_timestamp: 1761438768827
+model_id: m-af4d9595f2cb4ea7b9cf677be84e3ab6
+model_type: null
+name: model
+source_run_id: 86a9ee69a8954167b0873f9257120b7c
+status: 2
+status_message: null
