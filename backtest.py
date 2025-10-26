@@ -41,7 +41,7 @@ def backtest(data, reference_features=None, compare_features=None):
 
     Returns:
         tuple: Final cash, portfolio value over time, win rate, buy count, sell count, hold count, total trades,
-               data drift results, p-values results, dashboard snapshot.
+               data drift results, p-values results.
     """
 
     # Trade params

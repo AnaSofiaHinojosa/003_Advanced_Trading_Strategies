@@ -148,7 +148,7 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         plot_trade_distribution(buy, sell, hold, section=dataset_name)
 
         # --- Plot portfolio value ---
-        plot_portfolio_value(portfolio_value, section=dataset_name)
+        plot_portfolio_value(data, portfolio_value, section=dataset_name)
 
 def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
     """
