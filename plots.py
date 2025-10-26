@@ -17,7 +17,7 @@ def plot_portfolio_value(df: pd.DataFrame, portfolio_value: list, section: str) 
     
     plt.figure(figsize=(12, 6))
 
-    if section == "test_val":
+    if section == "test + val":
         # Split into two halves for test and validation
         half = len(portfolio_value) // 2
 

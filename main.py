@@ -56,7 +56,7 @@ def main():
         "train": (data_train_bt, x_train_norm),
         "test": (data_test_bt, x_test_norm),
         "val": (data_val_bt, x_val_norm),
-        "test_val": (data_combined_bt, x_combined_norm)
+        "test + val": (data_combined_bt, x_combined_norm)
     }
     
     # --- MLP ---
