@@ -14,10 +14,22 @@ def plot_portfolio_value(df: pd.DataFrame, portfolio_value: list, section: str) 
     """
 
     colors = {'train': 'steelblue', 'test': 'palevioletred', 'val': 'indianred'}
-    color = colors[section]
-
+    
     plt.figure(figsize=(12, 6))
-    plt.plot(df.index, portfolio_value, color=color, alpha=0.7)
+
+    if section == "test_val":
+        # Split into two halves for test and validation
+        half = len(portfolio_value) // 2
+
+        plt.plot(df.index[:half], portfolio_value[:half],
+                 color='palevioletred', alpha=0.7, label="Test")
+        plt.plot(df.index[half:], portfolio_value[half:],
+                 color='indianred', alpha=0.7, label="Validation")
+
+    else:
+        color = colors[section]
+        plt.plot(df.index, portfolio_value, color=color, alpha=0.7, label=section.capitalize())
+
     plt.title(f'Portfolio value over time ({section})')
     plt.xlabel("Date")
     plt.ylabel("Portfolio value")

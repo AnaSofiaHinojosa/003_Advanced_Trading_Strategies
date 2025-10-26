@@ -1,4 +1,6 @@
 # Entrypoint
+import pandas as pd
+
 from utils import get_data, split_data, get_target, load_model, run_nn
 from signals import add_all_indicators, get_signals
 from normalization import normalize_indicators, normalize_new_data, normalize_indicators_price, normalize_new_data_price
@@ -38,6 +40,14 @@ def main():
     data_val_bt = data_val_bt.dropna()
     data_val_norm = data_val_norm.dropna()
 
+    # --- Combine test + validation ---
+    data_combined = pd.concat([data_test, data_val]).sort_index()
+    data_combined_bt = pd.concat([data_test_bt, data_val_bt]).sort_index()
+    data_combined_norm = pd.concat([data_test_norm, data_val_norm]).sort_index()
+
+    # --- Separate target variable for combined ---
+    x_combined_norm, y_combined_norm = get_target(data_combined_norm)
+
     # --- Separate characteristics for test and validation sets ---
     x_test_norm, y_test_norm = get_target(data_test_norm)
     x_val_norm, y_val_norm = get_target(data_val_norm)
@@ -45,7 +55,8 @@ def main():
     datasets = {
         "train": (data_train_bt, x_train_norm),
         "test": (data_test_bt, x_test_norm),
-        "val": (data_val_bt, x_val_norm)
+        "val": (data_val_bt, x_val_norm),
+        "test_val": (data_combined_bt, x_combined_norm)
     }
     
     # --- MLP ---
