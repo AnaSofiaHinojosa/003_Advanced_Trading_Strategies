@@ -1,7 +1,7 @@
 # 003_Advanced_Trading_Strategies
 Project 003 for **Microstructure and Trading systems** class. This repo implements a full pipeline to train ML models for trading signals, backtest strategies, and visualize results via a dashboard.
 
-> Codebase includes modules like `main.py` (training), `backtest.py` (simulation), and `dashboard.py` (visualization), plus utilities under `utils.py`, `signals.py`, `metrics.py`, etc. The repo is licensed under MIT. ([GitHub][1])
+> Codebase includes modules like `main.py` (training), `backtest.py` (simulation), and `dashboard.py` (visualization), plus utilities under `utils.py`, `signals.py`, `metrics.py`, etc. The repo is licensed under MIT.
 
 ---
 
@@ -32,7 +32,7 @@ Project 003 for **Microstructure and Trading systems** class. This repo implemen
 * **Dashboard/visualization** for results (`dashboard.py`).
 * **Utilities & parameters** (`utils.py`, `params.py`).
 * **Reproducible environments** via `requirements.txt`.
-* **MIT License** for academic/educational use. ([GitHub][1])
+* **MIT License** for academic/educational use.
 
 ---
 
@@ -59,7 +59,7 @@ Project 003 for **Microstructure and Trading systems** class. This repo implemen
 └─ README.md
 ```
 
-> File names based on the public listing of the repository. ([GitHub][1])
+> File names based on the public listing of the repository.
 
 ---
 
@@ -69,7 +69,7 @@ Project 003 for **Microstructure and Trading systems** class. This repo implemen
 * **OS**: macOS (Apple Silicon M2 compatible), Linux, or Windows
 * **Packages**: Install from `requirements.txt`
 
-> A `requirements.txt` is present in the repo root. ([GitHub][1])
+> A `requirements.txt` is present in the repo root.
 
 ---
 
@@ -127,15 +127,7 @@ This will compute performance metrics (e.g., returns, drawdowns) and—depending
 
 ### 3) Dashboard
 
-There are two common patterns for `dashboard.py`:
-
-* **Dash/Plotly/Bokeh/Plain script**:
-
-  ```bash
-  python dashboard.py
-  ```
-
-  Then open the printed local URL (often `http://127.0.0.1:8050/`).
+Run the dashboard (`dashboard.py`) using Streamlit:
 
 * **Streamlit app** (if the file imports `streamlit`):
 
@@ -148,28 +140,18 @@ There are two common patterns for `dashboard.py`:
 > If you’re unsure which applies, open `dashboard.py` and look for imports:
 >
 > * If you see `import streamlit as st` → use **Streamlit** command.
-> * If you see `from dash import Dash` or `import dash` → use **python dashboard.py**.
 
 ---
 
 ## Configuration
 
 * **`params.py`**: Set default tickers, date ranges, feature flags, train/test splits, model configs, and output directories.
-* **Environment variables** (if any): If your data loader needs credentials (e.g., an API key), export them first:
-
-  ```bash
-  export DATA_API_KEY="your_token_here"       # macOS/Linux
-  # setx DATA_API_KEY "your_token_here"       # Windows (new shell)
-  ```
-
-> Adjust the values to match your environment, especially file paths and data locations.
 
 ---
 
 ## Data
 
-* If the project expects local CSV/Parquet files, place them in a `data/` folder (or as configured in `params.py`).
-* If it fetches data online (e.g., yfinance, APIs), ensure you have internet access and any needed keys.
+* The project fetches data online (e.g., yfinance, APIs), ensure you have internet access and any needed keys.
 * Typical columns (for OHLCV): `Date`, `Open`, `High`, `Low`, `Close`, `Volume`, plus any engineered features.
 
 ---
@@ -184,7 +166,6 @@ mlflow ui --backend-store-uri ./mlruns --host 127.0.0.1 --port 5000
 ```
 
 Open the UI at `http://127.0.0.1:5000` to browse experiments.
-(If not using MLflow, you can ignore this section.) ([GitHub][1])
 
 ---
 
@@ -209,13 +190,13 @@ Open the UI at `http://127.0.0.1:5000` to browse experiments.
 
 ## License
 
-This project is released under the **MIT License**. See [`LICENSE`](./LICENSE) for details. ([GitHub][1])
+This project is released under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
 
 ---
 
 ### Notes for reviewers/instructors
 
 * The **primary entry points** are `main.py` (training), `backtest.py` (evaluation), and `dashboard.py` (visualization).
-* Core utilities include `signals.py`, `normalization.py`, `metrics.py`, and `plots.py` for a reproducible ML + backtesting workflow. ([GitHub][1])
+* Core utilities include `signals.py`, `normalization.py`, `metrics.py`, and `plots.py` for a reproducible ML + backtesting workflow.
 
 ---
