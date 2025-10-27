@@ -16,6 +16,7 @@ def objective(trial: optuna.trial.Trial) -> float:
     Returns:
         float: Balance score (closer to 1.0 means classes are more evenly distributed).
     """
+
     # Suggest a value for alpha in the range [0.001, 0.1] with step 0.001
     alpha = trial.suggest_float("alpha", 0.001, 0.1, step=0.001)
 
@@ -45,6 +46,7 @@ def objective(trial: optuna.trial.Trial) -> float:
         score += 1 - abs(actual - ideal[cls_str])  # higher if closer to ideal
 
     score /= 3  # average over three classes
+
     return score
 
 
@@ -56,6 +58,7 @@ def find_best_alpha() -> float:
     Returns:
         float: Best alpha value found by Optuna.
     """
+    
     print("Running Optuna to find best alpha for class balance...")
 
     # Create Optuna study for maximization
