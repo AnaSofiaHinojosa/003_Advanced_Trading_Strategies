@@ -1,6 +1,7 @@
 import ta
 import pandas as pd
 
+
 def momentum_indicators(df: pd.DataFrame,
                         rsi_window: int = 14,
                         rsi2_window: int = 10,
@@ -82,6 +83,7 @@ def momentum_indicators(df: pd.DataFrame,
 
     return df
 
+
 def volatility_indicators(df: pd.DataFrame,
                           bb_window: int = 20,
                           donchian_window: int = 20,
@@ -121,6 +123,7 @@ def volatility_indicators(df: pd.DataFrame,
     df['donchian_low'] = donchian.donchian_channel_lband()
 
     return df
+
 
 def volume_indicators(df: pd.DataFrame,
                       mfi_window: int = 14,
@@ -165,6 +168,7 @@ def volume_indicators(df: pd.DataFrame,
 
     return df
 
+
 def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """
     Add all technical indicators to the DataFrame.
@@ -184,6 +188,7 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+
 def get_signals(df: pd.DataFrame, alpha: float = 0.02) -> pd.DataFrame:
     """
     Generate trading signals based on future price movements.
@@ -191,24 +196,26 @@ def get_signals(df: pd.DataFrame, alpha: float = 0.02) -> pd.DataFrame:
     Parameters:
         df (pd.DataFrame): Input DataFrame with price data.
         alpha (float): Threshold for generating buy/sell signals.
-    
+
     Returns:
         pd.DataFrame: DataFrame with added trading signals.
     """
-    
+
     df = df.copy()
 
-    # 5 day shifted column (future)
-    df['future_price'] = df['Close'].shift(-5)
+    # 7 day shifted column (future)
+    df['future_price'] = df['Close'].shift(-10)
 
     # Initialize all signals to 0
     df['final_signal'] = 0
 
     # Buy signals
-    df.loc[df[df.columns[0]] * (1+alpha) < df['future_price'], 'final_signal'] = 1
+    df.loc[df[df.columns[0]] *
+           (1+alpha) < df['future_price'], 'final_signal'] = 1
 
     # Sell signals
-    df.loc[df[df.columns[0]] * (1-alpha) > df['future_price'], 'final_signal'] = -1
+    df.loc[df[df.columns[0]] *
+           (1-alpha) > df['future_price'], 'final_signal'] = -1
 
     df.drop(columns=['future_price'], inplace=True)
 

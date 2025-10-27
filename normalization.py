@@ -1,6 +1,7 @@
 import pandas as pd
 from typing import Dict, Tuple
 
+
 def normalize_indicators(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     """
     Normalize technical indicators in the dataframe.
@@ -31,7 +32,8 @@ def normalize_indicators(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     # --- KAMA → relative to Close ---
     params['min_kama'] = df['kama'].min()
     params['max_kama'] = df['kama'].max()
-    df['kama'] = (df['kama'] - params['min_kama']) / (params['max_kama'] - params['min_kama'])
+    df['kama'] = (df['kama'] - params['min_kama']) / \
+        (params['max_kama'] - params['min_kama'])
 
     # --- ROC (z-score) ---
     for col in ['roc', 'roc2', 'roc3']:
@@ -60,13 +62,15 @@ def normalize_indicators(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     # --- CMF (-1 to 1) → 0 to 1 ---
     params['min_cmf'] = df['cmf'].min()
     params['max_cmf'] = df['cmf'].max()
-    df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
+    df['cmf'] = (df['cmf'] - params['min_cmf']) / \
+        (params['max_cmf'] - params['min_cmf'])
 
     df = df.drop(columns=['bb_upper', 'bb_lower',
                           'kc_upper', 'kc_lower',
                           'donchian_high', 'donchian_low'])
-    
+
     return df, params
+
 
 def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     """
@@ -79,7 +83,7 @@ def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Normalized DataFrame.
     """
-    
+
     df = df.copy()
 
     # --- RSI (0 to 100) → 0 to 1---
@@ -95,7 +99,8 @@ def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
         df[col] = (df[col] + 100) / 100
 
     # --- KAMA → relative to Close ---
-    df['kama'] = (df['kama'] - params['min_kama']) / (params['max_kama'] - params['min_kama'])
+    df['kama'] = (df['kama'] - params['min_kama']) / \
+        (params['max_kama'] - params['min_kama'])
 
     # --- ROC (z-score) ---
     for col in ['roc', 'roc2', 'roc3']:
@@ -118,13 +123,15 @@ def normalize_new_data(df: pd.DataFrame, params: dict) -> pd.DataFrame:
         df[col] = (df[col] - params[f'mean_{col}']) / params[f'std_{col}']
 
     # --- CMF (-1 to 1) → 0 to 1 ---
-    df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
+    df['cmf'] = (df['cmf'] - params['min_cmf']) / \
+        (params['max_cmf'] - params['min_cmf'])
 
     df = df.drop(columns=['bb_upper', 'bb_lower',
-                        'kc_upper', 'kc_lower',
-                        'donchian_high', 'donchian_low'])
+                          'kc_upper', 'kc_lower',
+                          'donchian_high', 'donchian_low'])
 
     return df
+
 
 def normalize_indicators_price(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     """
@@ -156,7 +163,8 @@ def normalize_indicators_price(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     # --- KAMA → relative to Close ---
     params['min_kama'] = df['kama'].min()
     params['max_kama'] = df['kama'].max()
-    df['kama'] = (df['kama'] - params['min_kama']) / (params['max_kama'] - params['min_kama'])
+    df['kama'] = (df['kama'] - params['min_kama']) / \
+        (params['max_kama'] - params['min_kama'])
 
     # --- ROC (z-score) ---
     for col in ['roc', 'roc2', 'roc3']:
@@ -185,7 +193,8 @@ def normalize_indicators_price(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     # --- CMF (-1 to 1) → 0 to 1 ---
     params['min_cmf'] = df['cmf'].min()
     params['max_cmf'] = df['cmf'].max()
-    df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
+    df['cmf'] = (df['cmf'] - params['min_cmf']) / \
+        (params['max_cmf'] - params['min_cmf'])
 
     # --- Close ---
     params['mean_close'] = df['Close'].mean()
@@ -195,8 +204,9 @@ def normalize_indicators_price(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     df = df.drop(columns=['bb_upper', 'bb_lower',
                           'kc_upper', 'kc_lower',
                           'donchian_high', 'donchian_low'])
-    
+
     return df, params
+
 
 def normalize_new_data_price(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     """
@@ -209,7 +219,7 @@ def normalize_new_data_price(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Normalized DataFrame.
     """
-    
+
     df = df.copy()
 
     # --- RSI (0 to 100) → 0 to 1---
@@ -225,7 +235,8 @@ def normalize_new_data_price(df: pd.DataFrame, params: dict) -> pd.DataFrame:
         df[col] = (df[col] + 100) / 100
 
     # --- KAMA → relative to Close ---
-    df['kama'] = (df['kama'] - params['min_kama']) / (params['max_kama'] - params['min_kama'])
+    df['kama'] = (df['kama'] - params['min_kama']) / \
+        (params['max_kama'] - params['min_kama'])
 
     # --- ROC (z-score) ---
     for col in ['roc', 'roc2', 'roc3']:
@@ -248,14 +259,14 @@ def normalize_new_data_price(df: pd.DataFrame, params: dict) -> pd.DataFrame:
         df[col] = (df[col] - params[f'mean_{col}']) / params[f'std_{col}']
 
     # --- CMF (-1 to 1) → 0 to 1 ---
-    df['cmf'] = (df['cmf'] - params['min_cmf']) / (params['max_cmf'] - params['min_cmf'])
+    df['cmf'] = (df['cmf'] - params['min_cmf']) / \
+        (params['max_cmf'] - params['min_cmf'])
 
     # --- Close ---
     df['Close'] = (df['Close'] - params['mean_close']) / params['std_close']
 
     df = df.drop(columns=['bb_upper', 'bb_lower',
-                        'kc_upper', 'kc_lower',
-                        'donchian_high', 'donchian_low'])
+                          'kc_upper', 'kc_lower',
+                          'donchian_high', 'donchian_low'])
 
     return df
-    

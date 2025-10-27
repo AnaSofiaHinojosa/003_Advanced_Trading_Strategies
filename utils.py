@@ -9,6 +9,7 @@ from plots import plot_portfolio_value, plot_trade_distribution
 
 # 15 years of data
 
+
 def get_data(ticker: str) -> pd.DataFrame:
     """
     Fetch historical market data for a given ticker symbol.
@@ -18,7 +19,7 @@ def get_data(ticker: str) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: DataFrame containing historical market data.
-    """ 
+    """
 
     data = yf.download(ticker, period="15y", interval="1d")
 
@@ -28,6 +29,7 @@ def get_data(ticker: str) -> pd.DataFrame:
     data = data[['Open', 'High', 'Low', 'Close', 'Volume']].dropna()
 
     return data
+
 
 def split_data(data: pd.DataFrame):
     """
@@ -39,7 +41,7 @@ def split_data(data: pd.DataFrame):
     Returns:
         tuple: (train, test, validation) DataFrames.
     """
-    
+
     # 60% train, 20% test, 20% validation
     train_size = int(len(data) * 0.6)
     test_size = int(len(data) * 0.2)
@@ -51,23 +53,25 @@ def split_data(data: pd.DataFrame):
 
     return train, test, validation
 
-def get_target(data:pd.DataFrame) -> pd.Series:
-        """
-        Generate target variable y from the data.
 
-        Parameters:
-            data (pd.DataFrame): Market data with indicators and signals.
+def get_target(data: pd.DataFrame) -> pd.Series:
+    """
+    Generate target variable y from the data.
 
-        Returns:
-            pd.Series: Target variable indicating final trading signals.
-        """
-        
-        y = data['final_signal']
-        X = data.drop(columns=['final_signal', 'Open', 'High', 'Low', 'Volume'])
+    Parameters:
+        data (pd.DataFrame): Market data with indicators and signals.
 
-        return X, y
+    Returns:
+        pd.Series: Target variable indicating final trading signals.
+    """
 
-def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash):
+    y = data['final_signal']
+    X = data.drop(columns=['final_signal', 'Open', 'High', 'Low', 'Volume'])
+
+    return X, y
+
+
+def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash) -> None:
     """
     Show the results of the backtest.
 
@@ -96,7 +100,8 @@ def show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value,
     print(f"Cash: ${cash:,.2f}")
     print(f"Portfolio value: ${portfolio_value[-1]:,.2f}")
 
-def load_model(model_name: str, model_version: str):
+
+def load_model(model_name: str, model_version: str) -> tf.keras.Model:
     """
     Load a TensorFlow model from MLflow.
 
@@ -116,7 +121,8 @@ def load_model(model_name: str, model_version: str):
 
     return model
 
-def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+
+def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None) -> None:
     """
     Run backtest per dataset (train/test/val) using the provided model.
 
@@ -128,7 +134,7 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
 
     for dataset_name, (data, x_data) in datasets.items():
         print(f"\n--- {dataset_name.upper()} ---")
-        
+
         # --- Predict ---
         y_pred = model.predict(x_data)
         y_pred_classes = np.argmax(y_pred, axis=1)
@@ -138,11 +144,12 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
 
         # --- Backtest the strategy with optional drift check ---
         cash, portfolio_value, win_rate, buy, sell, hold, total_trades, _, _ = backtest(data,
-                                                                            reference_features=reference_features, 
-                                                                            compare_features=x_data)
+                                                                                        reference_features=reference_features,
+                                                                                        compare_features=x_data)
 
         # --- Show results ---
-        show_results(data, buy, sell, hold, total_trades, win_rate, portfolio_value, cash)
+        show_results(data, buy, sell, hold, total_trades,
+                     win_rate, portfolio_value, cash)
 
         # --- Plot trade distribution ---
         plot_trade_distribution(buy, sell, hold, section=dataset_name)
@@ -150,7 +157,8 @@ def run_nn(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFra
         # --- Plot portfolio value ---
         plot_portfolio_value(data, portfolio_value, section=dataset_name)
 
-def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None):
+
+def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features: pd.DataFrame = None) -> None:
     """
     Run backtest and calculate data drift per dataset (train/test/val).
 
@@ -187,6 +195,7 @@ def run_nn_data_drift(datasets: dict, model: tf.keras.Model, reference_features:
 
     return all_data_drift_results, all_p_values_results, portfolio_value
 
+
 def most_drifted_features(drift_results: dict, p_values: dict, top_n: int = 5, pvals_windows: list = None) -> pd.DataFrame:
     """
     Identify the top N most drifted features based on p-values and optionally show number of windows drifted.
@@ -201,18 +210,24 @@ def most_drifted_features(drift_results: dict, p_values: dict, top_n: int = 5, p
         pd.DataFrame: DataFrame with top N drifted features, avg p-value, and windows drifted.
     """
 
-    drifted_features = {feat: pval for feat, pval in p_values.items() if drift_results.get(feat, False)}
-    sorted_features = sorted(drifted_features.items(), key=lambda item: item[1])
+    drifted_features = {feat: pval for feat,
+                        pval in p_values.items() 
+                        if drift_results.get(feat, False) and feat.lower() != "close"}
+    sorted_features = sorted(drifted_features.items(),
+                             key=lambda item: item[1])
     top_drifted = sorted_features[:top_n]
 
     results = []
     for feat, avg_pval in top_drifted:
         windows_drifted = 0
         if pvals_windows:
-            windows_drifted = sum(1 for window in pvals_windows if window.get(feat, np.nan) < 0.05)
-        results.append({"Feature": feat, "P-Value": avg_pval, "Windows Drifted": windows_drifted})
+            windows_drifted = sum(
+                1 for window in pvals_windows if window.get(feat, np.nan) < 0.05)
+        results.append({"Feature": feat, "P-Value": avg_pval,
+                       "Windows Drifted": windows_drifted})
 
     return pd.DataFrame(results)
+
 
 def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
     """
@@ -239,7 +254,8 @@ def statistics_table(drift_flags: dict, p_values: dict) -> pd.DataFrame:
 
     return pd.DataFrame(data)
 
-def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1):
+
+def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1) -> tuple[list, np.ndarray]:
     """
     Returns the indices of windows with most features drifted.
 
@@ -251,15 +267,15 @@ def get_drifted_windows(pvals_split, threshold=0.05, top_fraction=0.1):
     Returns:
         tuple: (drift_windows, drift_counts)
     """
-    
+
     drift_counts = []
     for window in pvals_split:
         drift_count = sum(1 for p in window.values() if p < threshold)
         drift_counts.append(drift_count)
     drift_counts = np.array(drift_counts)
-    
+
     # Mark windows above top_fraction percentile
     cutoff = np.percentile(drift_counts, 100*(1-top_fraction))
     drift_windows = np.where(drift_counts >= cutoff)[0]
-    
+
     return drift_windows, drift_counts

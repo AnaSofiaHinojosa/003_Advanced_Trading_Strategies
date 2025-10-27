@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/sofia/Desktop/se%CC%81ptimo/003_Advanced_Trading_Strategies/mlruns/401509745105321326/3aba97c6cf0a4dbd91a654eee828e833/artifacts
+end_time: 1761512911041
+entry_point_name: ''
+experiment_id: '401509745105321326'
+lifecycle_stage: active
+run_id: 3aba97c6cf0a4dbd91a654eee828e833
+run_name: dense3_units64_activationtanh
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761512852473
+status: 3
+tags: []
+user_id: sofia

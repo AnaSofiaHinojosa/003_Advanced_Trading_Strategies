@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp
 
+
 def ks_drift(reference_data: pd.Series, new_data: pd.Series, alpha: float = 0.05) -> float:
     """
     Calculate the Kolmogorov-Smirnov statistic to detect data drift between two datasets.
@@ -17,6 +18,7 @@ def ks_drift(reference_data: pd.Series, new_data: pd.Series, alpha: float = 0.05
     statistic, p_value = ks_2samp(reference_data, new_data)
 
     return p_value < alpha
+
 
 def calculate_drift_metrics(reference_df: pd.DataFrame, new_df: pd.DataFrame, alpha: float = 0.05) -> dict:
     """
@@ -35,8 +37,9 @@ def calculate_drift_metrics(reference_df: pd.DataFrame, new_df: pd.DataFrame, al
     for column in reference_df.columns:
         drift_detected = ks_drift(reference_df[column], new_df[column], alpha)
         drift_results[column] = drift_detected
-        
+
     return drift_results
+
 
 def calculate_drift_pvalues(reference_df: pd.DataFrame, new_df: pd.DataFrame) -> dict:
     """

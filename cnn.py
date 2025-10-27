@@ -1,9 +1,11 @@
 import tensorflow as tf
 import mlflow
+from sklearn.metrics import f1_score, accuracy_score
 
 # Function 1: Build CNN model
 
-def build_cnn_model(input_shape, params):
+
+def build_cnn_model(input_shape, params) -> tf.keras.Model:
     """
     Build a Convolutional Neural Network (CNN) model with hyperparameters.
 
@@ -40,12 +42,13 @@ def build_cnn_model(input_shape, params):
     model.compile(optimizer=optimizer,
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
-    
+
     return model
 
 # Function 2: Train and log with MLflow
 
-def train_and_log_cnn(x_train, y_train, x_test, y_test, params_space, epochs=2, batch_size=32):
+
+def train_and_log_cnn(x_train, y_train, x_test, y_test, x_val, y_val, params_space, epochs=2, batch_size=32) -> None:
     """
     Train multiple CNN configurations and log results to MLflow.
 
@@ -64,6 +67,7 @@ def train_and_log_cnn(x_train, y_train, x_test, y_test, params_space, epochs=2, 
     # Shift labels from -1,0,1 → 0,1,2 for compatibility
     y_train = y_train + 1
     y_test = y_test + 1
+    y_val = y_val + 1
 
     input_shape = x_train.shape[1]
 
@@ -82,9 +86,33 @@ def train_and_log_cnn(x_train, y_train, x_test, y_test, params_space, epochs=2, 
                 verbose=2
             )
 
+            # Predictions
+            y_pred_train = model.predict(x_train)
+            y_pred_val = model.predict(x_test)
+            y_pred_test = model.predict(x_val)
+
+            # Compute F1 scores
+            train_f1_val = f1_score(
+                y_train, y_pred_train.argmax(axis=1), average='weighted')
+            test_f1_val = f1_score(
+                y_test, y_pred_val.argmax(axis=1), average='weighted')
+            val_f1_val = f1_score(
+                y_val, y_pred_test.argmax(axis=1), average='weighted')
+
+            # Compute validation set accuracy
+            val_accuracy = accuracy_score(y_test, y_pred_val.argmax(axis=1))
+
+            # Log metrics
             final_metrics = {
                 "accuracy": hist.history['accuracy'][-1],
                 "loss": hist.history['loss'][-1],
                 "val_accuracy": hist.history['val_accuracy'][-1],
                 "val_loss": hist.history['val_loss'][-1],
             }
+
+            mlflow.log_metrics({
+                "test_accuracy": val_accuracy,
+                "f1_score": train_f1_val,
+                "val_f1_score": test_f1_val,
+                "test_f1_score": val_f1_val,
+            })

@@ -1,34 +1,32 @@
+from plots import make_overlay_histograms, plot_drifted_features_timeline
+from backtest import backtest
+from normalization import normalize_indicators, normalize_new_data
+from signals import add_all_indicators, get_signals
+from utils import get_data, split_data, get_target, most_drifted_features, statistics_table
+import plotly.graph_objects as go
+import streamlit as st
+import pandas as pd
+import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
-import numpy as np
-import pandas as pd
-import streamlit as st
-import plotly.graph_objects as go
 
-from utils import get_data, split_data, get_target, most_drifted_features, statistics_table
-from signals import add_all_indicators, get_signals
-from normalization import normalize_indicators, normalize_new_data
-from backtest import backtest
-from plots import make_overlay_histograms, plot_drifted_features_timeline
-
-# -------------------------------
 # Streamlit page setup
-# -------------------------------
 st.set_page_config(page_title="Neural Networks Drift Analysis", layout="wide")
 st.title("Drift Analysis for Neural Networks")
-st.subheader("Timeline view: Feature Distributions Histograms and P-values over Time")
+st.subheader(
+    "Timeline view: Feature Distributions Histograms and P-values over Time")
 
 with st.sidebar:
     st.header("Settings")
-    ticker = st.text_input("Ticker", value="HP")
+    ticker = st.text_input("Ticker", value="LULU")
     run_btn = st.button("Run Drift Analysis")
 
-# -------------------------------
 # Dataset building
-# -------------------------------
+
+
 @st.cache_data(show_spinner=False)
-def build_datasets(ticker: str):
+def build_datasets(ticker: str) -> tuple:
     """
     Build training, testing, and validation datasets for the specified ticker.
 
@@ -64,22 +62,22 @@ def build_datasets(ticker: str):
 
     return train, test, val, x_train, x_test, x_val
 
-# -------------------------------
+
 # Run and display histograms + p-values
-# -------------------------------
 if run_btn:
     with st.spinner(f"Running drift analysis for {ticker}..."):
         train, test, val, x_train, x_test, x_val = build_datasets(ticker)
 
         # Run backtest for Test and Val
-        _, _, _, _, _, _, _, _, pvals_test = backtest(test, reference_features=x_train, compare_features=x_test)
-        _, _, _, _, _, _, _, _, pvals_val = backtest(val, reference_features=x_train, compare_features=x_val)
+        _, _, _, _, _, _, _, _, pvals_test = backtest(
+            test, reference_features=x_train, compare_features=x_test)
+        _, _, _, _, _, _, _, _, pvals_val = backtest(
+            val, reference_features=x_train, compare_features=x_val)
 
-        common_features = sorted(set(x_train.columns) & set(x_test.columns) & set(x_val.columns))
+        common_features = sorted(set(x_train.columns) & set(
+            x_test.columns) & set(x_val.columns))
 
-        # -------------------------------
         # Display histograms and p-value plots
-        # -------------------------------
         for i, feat in enumerate(common_features):
             # Overlay histogram
             fig = make_overlay_histograms(
@@ -122,23 +120,27 @@ if run_btn:
                     annotation_text="Significance Level (0.05)", annotation_position="top left"
                 )
                 pval_fig.update_layout(
-                    title=dict(text=f"{split_name} Set", x=0.5, xanchor="center"),
+                    title=dict(text=f"{split_name} Set",
+                               x=0.5, xanchor="center"),
                     yaxis_title="P-value",
                     xaxis_title="Window Index",
                     margin=dict(l=10, r=10, t=40, b=10)
                 )
                 col.plotly_chart(pval_fig, use_container_width=True)
 
-        # -------------------------------
         # Statistics tables for Test and Val
-        # -------------------------------
-        st.subheader("Statistics Table: Periods and Features with Detected Drift")
+        st.subheader(
+            "Statistics Table: Periods and Features with Detected Drift")
 
-        avg_pvals_test = {feat: np.nanmean([win.get(feat, np.nan) for win in pvals_test]) for feat in common_features}
-        avg_pvals_val = {feat: np.nanmean([win.get(feat, np.nan) for win in pvals_val]) for feat in common_features}
+        avg_pvals_test = {feat: np.nanmean(
+            [win.get(feat, np.nan) for win in pvals_test]) for feat in common_features}
+        avg_pvals_val = {feat: np.nanmean(
+            [win.get(feat, np.nan) for win in pvals_val]) for feat in common_features}
 
-        drift_flags_test = {feat: (pval < 0.05) for feat, pval in avg_pvals_test.items()}
-        drift_flags_val = {feat: (pval < 0.05) for feat, pval in avg_pvals_val.items()}
+        drift_flags_test = {feat: (pval < 0.05)
+                            for feat, pval in avg_pvals_test.items()}
+        drift_flags_val = {feat: (pval < 0.05)
+                           for feat, pval in avg_pvals_val.items()}
 
         df_stats_test = statistics_table(drift_flags_test, avg_pvals_test)
         df_stats_val = statistics_table(drift_flags_val, avg_pvals_val)
@@ -151,21 +153,18 @@ if run_btn:
             st.markdown("#### Validation Set")
             st.dataframe(df_stats_val.style.format({"P-Value": "{:.4f}"}))
 
-        # -------------------------------
         # Show drifted windows plot
-        # -------------------------------
         st.subheader("Highlighted Drifted Windows")
 
-        fig_test, fig_val = plot_drifted_features_timeline(pvals_test, pvals_val)
+        fig_test, fig_val = plot_drifted_features_timeline(
+            pvals_test, pvals_val)
         col1, col2 = st.columns(2)
         with col1:
             st.plotly_chart(fig_test, use_container_width=True)
         with col2:
             st.plotly_chart(fig_val, use_container_width=True)
 
-        # -------------------------------
         # Show top 5 drifted features
-        # -------------------------------
         st.subheader("Summary: Top 5 Most Drifted Features")
         top_drifted_test = most_drifted_features(
             drift_flags_test,
@@ -187,7 +186,8 @@ if run_btn:
         with col2:
             st.markdown("#### Validation Set")
             st.dataframe(top_drifted_val.style.format({"P-Value": "{:.4f}"}))
-    
-    st.success("Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
+
+    st.success(
+        "Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
 else:
     st.info("Set your ticker on the left and click **Run Drift Analysis** to begin.")
