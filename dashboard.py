@@ -128,6 +128,21 @@ if run_btn:
                 )
                 col.plotly_chart(pval_fig, use_container_width=True)
 
+        with st.expander("Histograms and P-Value Plots Explanation", expanded=False):
+            st.markdown("""
+            This section generates three overlayed histograms per feature, followed by p-value plots for both the Test and Validation sets.
+
+            ### Overlayed Histograms
+            - **Purple Histogram**: Distribution of the feature in the Training set (reference).
+            - **Blue Histogram**: Distribution of the feature in the Test set (comparison).
+            - **Pink Histogram**: Distribution of the feature in the Validation set (comparison).   
+
+            ### P-Value Plots
+            - Each plot shows the p-values computed over sequential time windows for the Test and Validation sets.
+            - The shaded red area indicates p-values below the significance threshold of 0.05, suggesting drift.
+            - A horizontal dashed line marks the 0.05 significance level for easy reference.                                 
+            """)
+
         # Statistics tables for Test and Val
         st.subheader(
             "Statistics Table: Periods and Features with Detected Drift")
@@ -153,6 +168,26 @@ if run_btn:
             st.markdown("#### Validation Set")
             st.dataframe(df_stats_val.style.format({"P-Value": "{:.4f}"}))
 
+        with st.expander("How Drift Statistics Tables are Computed and Interpreted"):
+            st.markdown("""
+            This section generates tables summarizing **statistical drift detection** across features for both the Test and Validation sets.
+
+            ### Key Steps
+            1. **Compute average p-values per feature**  
+            - For each feature, the mean p-value across all time windows is calculated.  
+            - This gives an overall measure of drift significance for the feature over the dataset.
+
+            2. **Determine drift flags**  
+            - If the average p-value < 0.05, the feature is flagged as experiencing significant drift.  
+            - This highlights features whose distributions have shifted meaningfully over time.
+
+            3. **Generate statistics tables**  
+            - The drift flags and average p-values are combined into a structured table.  
+            - Each table shows which features have drifted and how significant the drift is numerically.
+
+            These tables are essential for understanding **which features are unstable** and whether the model may need retraining or adaptation.
+            """)         
+
         # Show drifted windows plot
         st.subheader("Highlighted Drifted Windows")
 
@@ -163,6 +198,27 @@ if run_btn:
             st.plotly_chart(fig_test, use_container_width=True)
         with col2:
             st.plotly_chart(fig_val, use_container_width=True)
+        with st.expander("Highlighted Drifted Windows Details", expanded=False):
+            st.markdown("""
+            These graphs show how many features drifted in each time window for the **Test Set** and **Validation Set**.
+            ### Graph Components
+            - **X-Axis**: Time windows (sequential segments of the dataset).
+            - **Y-Axis**: Number of features detected as drifted in that window.
+            - **Colored bands**:
+                - Red: High drift
+                - Yellow: Moderate drift
+                - Green: Low drift
+
+            ### Interpretation
+            - **Test Set**: Drift fluctuates across windows, with occasional peaks in the red zone and lower values in the yellow. This pattern suggests intermittent instability in the financial indicators during this period, likely reflecting temporary market fluctuations, seasonal effects, or short-lived changes in trading behavior rather than sustained shifts. The model may still perform reasonably well during stable windows but could be sensitive to sudden volatility spikes.
+            - **Validation Set**: Drift is consistently high, with most windows in the red zone. This indicates persistent distribution shifts in the asset's financial indicators over the last three years, potentially due to structural changes in the market, evolving consumer behavior, or shifts in volatility patterns. The sustained high drift signals that models trained on the earlier period may underperform unless retrained or adapted to the new regime.
+            
+            ### Why Is This Important?  
+            - High drift across windows can degrade model performance and signal regime changes.
+            - Consistent drift in the validation set may require retraining or feature re-engineering.
+            - Visualizing drift per window helps pinpoint when and where the data distribution changes most.
+
+            """)    
 
         # Show top 5 drifted features
         st.subheader("Summary: Top 5 Most Drifted Features")
@@ -186,6 +242,26 @@ if run_btn:
         with col2:
             st.markdown("#### Validation Set")
             st.dataframe(top_drifted_val.style.format({"P-Value": "{:.4f}"}))
+        with st.expander("Feature Drift Details", expanded=False):
+            st.markdown("""
+            ### Overview
+            Statistical drift detection results are summarized for five indicators across two datasets: **Test Set** and **Validation Set**.
+
+            - **P-Value**: Measures the statistical significance of drift (lower values indicate more significant drift).
+            - **Windows Drifted**: The number of time windows in which drift was detected.
+
+            ### What These Indicators Measure
+            - **KAMA (Kaufman Adaptive Moving Average):** Adapts to market volatility, drift suggests changing volatility regimes.
+            - **OBV (On-Balance Volume)** and **AD (Accumulation/Distribution):** Volume-based indicators, drift implies altered buying or selling pressure.
+            - **EOM (Ease of Movement):** Reflects how easily price moves, drift signals shifts in liquidity or volatility.
+            - **FI (Force Index):** Combines price and volume, drift indicates changing momentum dynamics.
+
+            ### Why So Much Drift?
+            - **Market Regime Change:** Structural shifts may have altered price–volume relationships.
+            - **Feature Sensitivity:** These indicators are highly reactive to volatility and volume changes.
+            - **Window Size:** Shorter windows amplify moderate fluctuations.
+            """)
+               
 
     st.success(
         "Drift analysis complete. Histograms, p-value plots, statistics table, and drift summary displayed above.")
