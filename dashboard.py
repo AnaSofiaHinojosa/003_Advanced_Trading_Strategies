@@ -192,7 +192,11 @@ if run_btn:
         st.subheader("Highlighted Drifted Windows")
 
         fig_test, fig_val = plot_drifted_features_timeline(
-            pvals_test, pvals_val)
+            pvals_test,
+            pvals_val,
+            end_date_val="2025-10-01"  # <-- added for datetime x-axis
+        )
+
         col1, col2 = st.columns(2)
         with col1:
             st.plotly_chart(fig_test, use_container_width=True)

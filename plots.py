@@ -108,38 +108,46 @@ def make_overlay_histograms(train, test, val, feature_name) -> go.Figure:
     return fig
 
 
-def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_threshold: float = 0.05) -> tuple[go.Figure, go.Figure]:
+def plot_drifted_features_timeline(
+    pvals_test: list,
+    pvals_val: list,
+    drift_threshold: float = 0.05,
+    end_date_val: str | None = None
+) -> tuple[go.Figure, go.Figure]:
     """
     Create separate plots for number of drifted features per window for Test and Validation sets.
+    Uses datetime for x-axis instead of window index.
 
     Parameters:
         pvals_test (list of dicts): P-values per feature per window for Test set.
         pvals_val (list of dicts): P-values per feature per window for Validation set.
         drift_threshold (float): Threshold for p-value to consider feature drifted.
+        end_date_val (str, optional): Last date of validation period (YYYY-MM-DD). Defaults to today.
 
     Returns:
         fig_test (go.Figure), fig_val (go.Figure)
     """
 
     # Count drifted features per window
-    drift_counts_test = [sum(1 for p in window.values(
-    ) if p < drift_threshold) for window in pvals_test]
-    drift_counts_val = [sum(1 for p in window.values(
-    ) if p < drift_threshold) for window in pvals_val]
+    drift_counts_test = [sum(p < drift_threshold for p in w.values()) for w in pvals_test]
+    drift_counts_val = [sum(p < drift_threshold for p in w.values()) for w in pvals_val]
 
-    x_test = list(range(len(drift_counts_test)))
-    x_val = list(range(len(drift_counts_val)))
+    # ------------------ Generate datetime x-axis ------------------
+    end_date_val = pd.to_datetime(end_date_val or pd.Timestamp.today())
+    start_date_val = end_date_val - pd.DateOffset(years=3)
+    start_date_test = start_date_val - pd.DateOffset(years=3)
 
-    def create_background_shapes(max_y):
+    dates_test = pd.date_range(start=start_date_test, end=start_date_val, periods=len(drift_counts_test))
+    dates_val = pd.date_range(start=start_date_val, end=end_date_val, periods=len(drift_counts_val))
+
+    # ------------------ Background shapes ------------------
+    def create_background_shapes(max_y: int) -> list[dict]:
         """Create colored background bands."""
         return [
-            # Green zone
             dict(type="rect", xref="paper", x0=0, x1=1, yref="y", y0=0, y1=12,
                  fillcolor="rgba(0, 255, 0, 0.1)", line=dict(width=0)),
-            # Yellow zone
             dict(type="rect", xref="paper", x0=0, x1=1, yref="y", y0=12, y1=20,
                  fillcolor="rgba(255, 255, 0, 0.15)", line=dict(width=0)),
-            # Red zone
             dict(type="rect", xref="paper", x0=0, x1=1, yref="y", y0=20, y1=max_y,
                  fillcolor="rgba(255, 0, 0, 0.1)", line=dict(width=0))
         ]
@@ -147,16 +155,15 @@ def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_thre
     # ------------------ Test plot ------------------
     fig_test = go.Figure()
     fig_test.add_trace(go.Scatter(
-        x=x_test,
+        x=dates_test,
         y=drift_counts_test,
         mode="lines+markers",
         name="Test",
         line=dict(color="cornflowerblue", width=2)
     ))
     fig_test.update_layout(
-        title=dict(text="Test Set: Drifted Features per Window",
-                   x=0.5, xanchor="center"),
-        xaxis_title="Window Index",
+        title=dict(text="Test Set: Drifted Features per Window", x=0.5, xanchor="center"),
+        xaxis_title="Date",
         yaxis_title="Number of Drifted Features",
         margin=dict(l=10, r=10, t=50, b=10),
         shapes=create_background_shapes(max_y=max(drift_counts_test + [22]))
@@ -165,16 +172,15 @@ def plot_drifted_features_timeline(pvals_test: list, pvals_val: list, drift_thre
     # ------------------ Validation plot ------------------
     fig_val = go.Figure()
     fig_val.add_trace(go.Scatter(
-        x=x_val,
+        x=dates_val,
         y=drift_counts_val,
         mode="lines+markers",
         name="Validation",
         line=dict(color="palevioletred", width=2)
     ))
     fig_val.update_layout(
-        title=dict(text="Validation Set: Drifted Features per Window",
-                   x=0.5, xanchor="center"),
-        xaxis_title="Window Index",
+        title=dict(text="Validation Set: Drifted Features per Window", x=0.5, xanchor="center"),
+        xaxis_title="Date",
         yaxis_title="Number of Drifted Features",
         margin=dict(l=10, r=10, t=50, b=10),
         shapes=create_background_shapes(max_y=max(drift_counts_val + [22]))
