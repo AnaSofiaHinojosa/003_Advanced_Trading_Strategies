@@ -51,7 +51,8 @@ Project 003 for **Microstructure and Trading systems** class. This repo implemen
 ├─ models.py           # Model wrappers / helpers
 ├─ mlp.py, cnn.py      # Example model architectures
 ├─ classbalance.py     # Class balancing utilities
-├─ utils.py            # IO, misc helpers
+├─ utils.py            # Varied functions
+├─ utilsdashboard.py   # Varied functions used for dashboard.py
 ├─ params.py           # Central configuration (paths, hyperparams)
 ├─ requirements.txt    # Python dependencies
 ├─ trainlog.py         # (Optional) training logs helpers
