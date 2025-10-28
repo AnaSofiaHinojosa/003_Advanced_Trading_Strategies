@@ -130,17 +130,13 @@ This will compute performance metrics (e.g., returns, drawdowns) and—depending
 
 Run the dashboard (`dashboard.py`) using Streamlit:
 
-* **Streamlit app** (if the file imports `streamlit`):
+* **Streamlit app**:
 
   ```bash
   streamlit run dashboard.py
   ```
 
   It will auto-open your browser.
-
-> If you’re unsure which applies, open `dashboard.py` and look for imports:
->
-> * If you see `import streamlit as st` → use **Streamlit** command.
 
 ---
 
