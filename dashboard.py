@@ -2,7 +2,7 @@ from plots import make_overlay_histograms, plot_drifted_features_timeline
 from backtest import backtest
 from normalization import normalize_indicators, normalize_new_data
 from signals import add_all_indicators, get_signals
-from utils import get_data, split_data, get_target, most_drifted_features, statistics_table
+from utilsdashboard import get_data, split_data, get_target, most_drifted_features, statistics_table
 import plotly.graph_objects as go
 import streamlit as st
 import pandas as pd
